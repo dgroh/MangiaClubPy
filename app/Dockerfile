@@ -2,7 +2,7 @@ FROM python:3
 
 MAINTAINER Daniel Groh
 
-COPY app /app
+COPY . /app
 
 WORKDIR /app
 
