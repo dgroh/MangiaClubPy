@@ -2,6 +2,7 @@
 version: '3.7'
 services:
   api:
-      build: .
+      build: ./app # workdir on Dockerfile
       ports:
         - 5000:5000
+      volumes: ['./app:/app'] # workdir:/physical path
