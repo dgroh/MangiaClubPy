@@ -4,7 +4,7 @@ from flask_restful import Resource, reqparse
 from flask_pymongo import MongoClient
 
 
-mongo = MongoClient(host='db', port=27017, connect=False)
+mongo = MongoClient(host='db')
 
 
 parser = reqparse.RequestParser()
