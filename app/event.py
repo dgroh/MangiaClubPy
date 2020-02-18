@@ -1,10 +1,11 @@
+import os
 from datetime import datetime
 from flask import Flask, jsonify
 from flask_restful import Resource, reqparse
 from flask_pymongo import MongoClient
 
 
-mongo = MongoClient(host='db')
+mongo = MongoClient(host=os.getenv("MONGO_DB_HOST"))
 
 
 parser = reqparse.RequestParser()
@@ -17,6 +18,7 @@ parser.add_argument('price_per_person', required=True, type=int, location='json'
 parser.add_argument('description', required=True, help="Description cannot be blank!", location='json')
 parser.add_argument('guests', action='append', location='json')
 parser.add_argument('rating', location='json')
+
 
 # shows a single event item and lets you delete or update an event
 class Event(Resource):

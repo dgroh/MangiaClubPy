@@ -11,5 +11,7 @@ services:
         - db
       depends_on: 
         - db
+      environment:
+        - MONGO_DB_HOST=db
   db:
       image: mongo
