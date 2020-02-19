@@ -7,7 +7,7 @@ This is the repository of the API of the **Mangia Club App**
 ### Prerequisites
 
 * [Git](https://git-scm.com/)
-* [Docker](https://www.docker.com/)
+* [Docker](https://www.docker.com/) with [docker-compose](https://docs.docker.com/compose/install/)
 
 The API is containerized and can be run inside [Docker](https://www.docker.com/). Therefore there is no need to install any other dependencies.
 
