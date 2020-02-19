@@ -1,11 +1,7 @@
-import os
 from datetime import datetime
 from flask import Flask, jsonify
 from flask_restful import Resource, reqparse
-from flask_pymongo import MongoClient
-
-
-mongo = MongoClient(host=os.getenv("MONGO_DB_HOST"))
+from extensions import db
 
 
 parser = reqparse.RequestParser()
@@ -23,10 +19,10 @@ parser.add_argument('rating', location='json')
 # shows a single event item and lets you delete or update an event
 class Event(Resource):
     def get(self, event_id):
-        return { 'response': mongo.db.events.find_one_or_404({'_id': event_id}) }
+        return { 'response': db.events.find_one_or_404({'_id': event_id}) }
 
     def put(self, event_id):
-        event = mongo.db.events.find_one_or_404({'_id': event_id})
+        event = db.events.find_one_or_404({'_id': event_id})
 
         args = parser.parse_args()
 
@@ -52,7 +48,7 @@ class Event(Resource):
 class EventList(Resource):
     def get(self):
         response = []
-        collection = mongo.db.events
+        collection = db.events
         events = collection.find()
 
         for event in events:
@@ -64,7 +60,7 @@ class EventList(Resource):
     def post(self):
         args = parser.parse_args()
 
-        mongo.db.events.insert_one({
+        db.events.insert_one({
             'host_id': '',
             'name': args['name'],
             'start_date_time': args['start_date_time'],
