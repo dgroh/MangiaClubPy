@@ -1,38 +1,42 @@
 from datetime import datetime
-from flask import Flask, jsonify
+from flask import Flask
 from flask_restful import Resource, reqparse
-from extensions import mongo_client
-
+from .extensions import mongo_client
+from bson import ObjectId
+import json
 
 parser = reqparse.RequestParser()
-parser.add_argument('name', required=True, help="Name cannot be blank!", location='json')
-parser.add_argument('start_date_time', required=True, help="Start date and time musst be a vlida datetime", location='json')
-parser.add_argument('end_date_time', required=True, help="End date and time musst be a vlida datetime", location='json')
-parser.add_argument('max_guests_allowed', required=True, type=int, location='json')
+parser.add_argument('name', location='json')
+parser.add_argument('start_date_time', help="Start date and time musst be a valid datetime", location='json')
+parser.add_argument('end_date_time', help="End date and time musst be a valid datetime", location='json')
+parser.add_argument('max_guests_allowed', type=int, location='json')
 parser.add_argument('cuisine', action='append', location='json')
-parser.add_argument('price_per_person', required=True, type=int, location='json')
-parser.add_argument('description', required=True, help="Description cannot be blank!", location='json')
+parser.add_argument('price_per_person', type=int, location='json')
+parser.add_argument('description', location='json')
 parser.add_argument('guests', action='append', location='json')
 parser.add_argument('rating', location='json')
-
 
 # shows a single event item and lets you delete or update an event
 class Event(Resource):
     def get(self, event_id):
-        return { 'response': mongo_client.db.events.find_one_or_404({'_id': event_id}) }
+        object_id = ObjectId(event_id)
+
+        response = json.dumps(mongo_client.db.events.find_one_or_404({ '_id': object_id }), default=str)
+
+        return { 'response': response }
 
     def put(self, event_id):
-        event = mongo_client.db.events.find_one_or_404({'_id': event_id})
+        object_id = ObjectId(event_id)
+
+        mongo_client.db.events.find_one_or_404({ '_id': object_id })
 
         args = parser.parse_args()
 
-        parsed_args = dict((key,value) for key,value in args.items() if key is not None)
+        fields = { key: value for key,value in args.items() if value is not None }
 
-        fields = []
-
-        event.update({ '_id': event_id },
+        mongo_client.db.events.update_one({ '_id': object_id },
         {
-            '$inc': {
+            '$push': {
                 '_changes': {
                     '_fields': fields,
                     '_updated_by_user': '',
@@ -52,10 +56,10 @@ class EventList(Resource):
         events = collection.find()
 
         for event in events:
-             event['_id'] = str(event['_id'])
-             response.append(event)
+            event['_id'] = str(event['_id'])
+            response.append(event)
 
-        return { 'response': response }
+        return { 'response': json.dumps(response, default=str) }
 
     def post(self):
         args = parser.parse_args()

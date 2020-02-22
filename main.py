@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api
-from event import Event, EventList
+from app.event import Event, EventList
 
 app = Flask(__name__)
 api = Api(app)
@@ -12,4 +12,4 @@ api.add_resource(EventList, '/api/v1/events')
 api.add_resource(Event, '/api/v1/events/<string:event_id>')
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run()
