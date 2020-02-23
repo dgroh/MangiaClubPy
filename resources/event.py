@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Flask
 from flask_restful import Resource, reqparse
-from db import mongo_client
+from db import mongo
 from bson import ObjectId
 import json
 
@@ -21,20 +21,24 @@ class Event(Resource):
     def get(self, event_id):
         object_id = ObjectId(event_id)
 
-        response = json.dumps(mongo_client.db.events.find_one_or_404({ '_id': object_id }), default=str)
+        events = mongo.db.events
+
+        response = json.dumps(events.find_one_or_404({ '_id': object_id }), default=str)
 
         return { 'response': response }
 
     def put(self, event_id):
         object_id = ObjectId(event_id)
 
-        mongo_client.db.events.find_one_or_404({ '_id': object_id })
+        events = mongo.db.events
+
+        events.find_one_or_404({ '_id': object_id })
 
         args = parser.parse_args()
 
         fields = { key: value for key,value in args.items() if value is not None }
 
-        mongo_client.db.events.update_one({ '_id': object_id },
+        events.update_one({ '_id': object_id },
         {
             '$push': {
                 '_changes': {
@@ -52,8 +56,7 @@ class Event(Resource):
 class EventList(Resource):
     def get(self):
         response = []
-        collection = mongo_client.db.events
-        events = collection.find()
+        events = mongo.db.events.find()
 
         for event in events:
             event['_id'] = str(event['_id'])
@@ -64,7 +67,9 @@ class EventList(Resource):
     def post(self):
         args = parser.parse_args()
 
-        mongo_client.db.events.insert_one({
+        events = mongo.db.events
+
+        events.insert_one({
             'host_id': '',
             'name': args['name'],
             'start_date_time': args['start_date_time'],
