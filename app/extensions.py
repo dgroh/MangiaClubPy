@@ -1,7 +1,7 @@
 import os
 from flask_pymongo import MongoClient
 
-mongo_db_host = os.getenv("MONGO_DB_HOST")
-mongo_db_port = os.getenv("MONGO_DB_PORT")
+if 'MONGO_DB_HOST' not in os.environ or 'MONGO_DB_PORT' not in os.environ:
+    raise Exception('MONGO_DB_HOST and MONGO_DB_PORT environment variables musst be set')
 
-mongo_client = MongoClient(mongo_db_host, int(mongo_db_port))
+mongo_client = MongoClient(os.getenv('MONGO_DB_HOST'), int(os.getenv('MONGO_DB_PORT')))
