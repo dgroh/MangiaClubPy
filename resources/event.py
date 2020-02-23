@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Flask
 from flask_restful import Resource, reqparse
-from .extensions import mongo_client
+from db import mongo_client
 from bson import ObjectId
 import json
 
