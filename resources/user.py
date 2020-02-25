@@ -30,8 +30,8 @@ class User(Resource):
         user = mongo.db.users.find_one_or_404({ '_id': object_id })
 
         user['_id'] = str(user['_id'])
-        user['password'] = str(user['password'])
-        user['password_salt'] = str(user['password_salt'])
+        user['hashed_password'] = user['hashed_password'].decode('utf-8')
+        user['password_salt'] = user['password_salt'].decode('utf-8')
 
         return make_response({'data': user}, HttpStatusCode.HTTP_200_OK)
 
@@ -70,8 +70,9 @@ class UserList(Resource):
 
         for user in users:
             user['_id'] = str(user['_id'])
-            user['hashed_password'] = str(user['hashed_password'])
-            user['password_salt'] = str(user['password_salt'])
+            user['hashed_password'] = user['hashed_password'].decode('utf-8')
+            user['password_salt'] = user['password_salt'].decode('utf-8')
+            
             response.append(user)
 
         return make_response({'data': response}, HttpStatusCode.HTTP_200_OK)
