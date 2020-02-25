@@ -1,8 +1,10 @@
 from datetime import datetime
-from flask import Flask, jsonify
+from flask import Flask, make_response
 from flask_restful import Resource, reqparse
-from db import mongo
 from bson import ObjectId
+
+from . import HttpStatusCode
+from db import mongo
 
 base_parser = reqparse.RequestParser()
 base_parser.add_argument('name', required=True, location='json')
@@ -30,7 +32,7 @@ class Event(Resource):
 
         event['_id'] = str(event['_id'])
 
-        return jsonify({'data': event})
+        return make_response({'data': event}, HttpStatusCode.HTTP_200_OK)
 
     def put(self, id):
         args = self.parser.parse_args()
@@ -54,7 +56,7 @@ class Event(Resource):
             }
         })
 
-        return '', 204
+        return '[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT
 
 
 class EventList(Resource):
@@ -69,7 +71,7 @@ class EventList(Resource):
             event['_id'] = str(event['_id'])
             response.append(event)
 
-        return jsonify({'data': response})
+        return make_response({'data': response}, HttpStatusCode.HTTP_200_OK)
 
     def post(self):
         args = self.parser.parse_args()
@@ -91,4 +93,4 @@ class EventList(Resource):
             '_created_date_time': datetime.utcnow()
         })
 
-        return '', 201
+        return '[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED

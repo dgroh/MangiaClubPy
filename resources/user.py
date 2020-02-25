@@ -1,10 +1,11 @@
 from datetime import datetime
-from flask import Flask, jsonify
+from flask import Flask, make_response
 from flask_restful import Resource, reqparse
-from db import mongo
 from bson import ObjectId
-import json
 import bcrypt
+
+from . import HttpStatusCode
+from db import mongo
 
 base_parser = reqparse.RequestParser()
 base_parser.add_argument('email', required=True, location='json')
@@ -32,7 +33,7 @@ class User(Resource):
         user['password'] = str(user['password'])
         user['password_salt'] = str(user['password_salt'])
 
-        return jsonify({'data': user})
+        return make_response({'data': user}, HttpStatusCode.HTTP_200_OK)
 
     def put(self, id):
         args = self.parser.parse_args()
@@ -56,7 +57,7 @@ class User(Resource):
             }
         })
 
-        return '', 204
+        return '[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT
 
 
 class UserList(Resource):
@@ -69,11 +70,11 @@ class UserList(Resource):
 
         for user in users:
             user['_id'] = str(user['_id'])
-            user['password'] = str(user['password'])
+            user['hashed_password'] = str(user['hashed_password'])
             user['password_salt'] = str(user['password_salt'])
             response.append(user)
 
-        return jsonify({'data': response})
+        return make_response({'data': response}, HttpStatusCode.HTTP_200_OK)
 
     def post(self):
         args = self.parser.parse_args()
@@ -82,13 +83,14 @@ class UserList(Resource):
 
         if existing_user is None:
             password_salt = bcrypt.gensalt()
-            hash_pass = bcrypt.hashpw(args['password'].encode('utf-8'), password_salt)
+
+            hashed_password = bcrypt.hashpw(args['password'].encode('utf-8'), password_salt)
 
             mongo.db.users.insert_one({
                 'email': args['email'],
                 'first_name': args['first_name'],
                 'last_name': args['last_name'],
-                'password': hash_pass,
+                'hashed_password': hashed_password,
                 'password_salt': password_salt,
                 'phone': args['phone'],
                 'published:': True,
@@ -96,6 +98,6 @@ class UserList(Resource):
                 '_created_date_time': datetime.utcnow()
             })
 
-            return '', 201
+            return '[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED
 
-        return '', 409
+        return '[HTTP_409_CONFLICT]', HttpStatusCode.HTTP_409_CONFLICT
