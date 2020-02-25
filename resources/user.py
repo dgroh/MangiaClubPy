@@ -6,18 +6,25 @@ from bson import ObjectId
 import json
 import bcrypt
 
-parser = reqparse.RequestParser()
-parser.add_argument('email', location='json')
-parser.add_argument('first_name', location='json')
-parser.add_argument('last_name', location='json')
-parser.add_argument('password', location='json')
-parser.add_argument('phone', location='json')
-parser.add_argument('is_host', type=bool, location='json')
-parser.add_argument('rating', location='json')
+base_parser = reqparse.RequestParser()
+base_parser.add_argument('email', required=True, location='json')
+base_parser.add_argument('first_name', required=True, location='json')
+base_parser.add_argument('last_name', required=True, location='json')
+base_parser.add_argument('password', required=True, location='json')
+base_parser.add_argument('phone', required=True, location='json')
 
 class User(Resource):
-    def get(self, user_id):
-        object_id = ObjectId(user_id)
+    def __init__(self):
+        self.parser = base_parser.copy()
+
+        for arg in self.parser.args:
+            arg.required=False
+
+        self.parser.add_argument('is_host', type=bool, location='json')
+        self.parser.add_argument('rating', location='json')
+
+    def get(self, id):
+        object_id = ObjectId(id)
 
         user = mongo.db.users.find_one_or_404({ '_id': object_id })
 
@@ -27,14 +34,14 @@ class User(Resource):
 
         return jsonify({'data': user})
 
-    def put(self, user_id):
-        object_id = ObjectId(user_id)
+    def put(self, id):
+        args = self.parser.parse_args()
+
+        object_id = ObjectId(id)
 
         users = mongo.db.users
 
         users.find_one_or_404({ '_id': object_id })
-
-        args = parser.parse_args()
 
         fields = { key: value for key,value in args.items() if value is not None }
 
@@ -53,6 +60,9 @@ class User(Resource):
 
 
 class UserList(Resource):
+    def __init__(self):
+        self.parser = base_parser.copy()
+
     def get(self):
         response = []
         users = mongo.db.users.find()
@@ -66,7 +76,7 @@ class UserList(Resource):
         return jsonify({'data': response})
 
     def post(self):
-        args = parser.parse_args()
+        args = self.parser.parse_args()
 
         existing_user = mongo.db.users.find_one({ 'email': args['email'] })
 
@@ -82,7 +92,6 @@ class UserList(Resource):
                 'password_salt': password_salt,
                 'phone': args['phone'],
                 'published:': True,
-                '_view_count:': 0,
                 '_created_by_user': args['email'],
                 '_created_date_time': datetime.utcnow()
             })
