@@ -4,6 +4,7 @@ from flask_restful import Resource, reqparse
 from bson import ObjectId
 
 from . import HttpStatusCode
+from .auth import token_required
 from db import mongo
 
 base_parser = reqparse.RequestParser()
@@ -34,7 +35,8 @@ class Event(Resource):
 
         return make_response({'data': event}, HttpStatusCode.HTTP_200_OK)
 
-    def put(self, id):
+    @token_required
+    def put(self, user_id, id):
         args = self.parser.parse_args()
 
         object_id = ObjectId(id)
@@ -50,7 +52,7 @@ class Event(Resource):
             '$push': {
                 'changes': {
                     'fields': fields,
-                    'updated_by_user': '',
+                    'updated_by_user': user_id,
                     'updated_date_time': datetime.utcnow()
                 }
             }
@@ -73,13 +75,14 @@ class EventList(Resource):
 
         return make_response({'data': response}, HttpStatusCode.HTTP_200_OK)
 
-    def post(self):
+    @token_required
+    def post(self, user_id):
         args = self.parser.parse_args()
 
         events = mongo.db.events
 
         events.insert_one({
-            'host_id': '',
+            'host_id': user_id,
             'name': args['name'],
             'start_date_time': args['start_date_time'],
             'end_date_time': args['end_date_time'],
@@ -89,7 +92,7 @@ class EventList(Resource):
             'description': args['description'],
             'published:': True,
             'view_count:': 0,
-            'created_by_user': '',
+            'created_by_user': user_id,
             'created_date_time': datetime.utcnow()
         })
 

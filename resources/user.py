@@ -5,6 +5,7 @@ from bson import ObjectId
 import bcrypt
 
 from . import HttpStatusCode
+from .auth import token_required
 from db import mongo
 
 base_parser = reqparse.RequestParser()
@@ -35,7 +36,8 @@ class User(Resource):
 
         return make_response({'data': user}, HttpStatusCode.HTTP_200_OK)
 
-    def put(self, id):
+    @token_required
+    def put(self, user_id, id):
         args = self.parser.parse_args()
 
         object_id = ObjectId(id)
@@ -51,7 +53,7 @@ class User(Resource):
             '$push': {
                 'changes': {
                     'fields': fields,
-                    'updated_by_user': '',
+                    'updated_by_user': user_id,
                     'updated_date_time': datetime.utcnow()
                 }
             }
@@ -87,7 +89,7 @@ class UserList(Resource):
 
             hashed_password = bcrypt.hashpw(args['password'].encode('utf-8'), password_salt)
 
-            mongo.db.users.insert_one({
+            inserted_id = mongo.db.users.insert_one({
                 'email': args['email'],
                 'first_name': args['first_name'],
                 'last_name': args['last_name'],
@@ -95,8 +97,14 @@ class UserList(Resource):
                 'password_salt': password_salt,
                 'phone': args['phone'],
                 'published:': True,
-                'created_by_user': args['email'],
                 'created_date_time': datetime.utcnow()
+            }).inserted_id
+
+            mongo.db.users.update_one({ '_id': inserted_id }, 
+            { 
+                '$set': {
+                    'created_by_user': str(inserted_id) 
+                }
             })
 
             return '[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED
