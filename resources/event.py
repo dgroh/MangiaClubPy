@@ -48,10 +48,10 @@ class Event(Resource):
         events.update_one({'_id': object_id},
         {
             '$push': {
-                '_changes': {
-                    '_fields': fields,
-                    '_updated_by_user': '',
-                    '_updated_date_time': datetime.utcnow()
+                'changes': {
+                    'fields': fields,
+                    'updated_by_user': '',
+                    'updated_date_time': datetime.utcnow()
                 }
             }
         })
@@ -88,9 +88,9 @@ class EventList(Resource):
             'price_per_person': args['price_per_person'],
             'description': args['description'],
             'published:': True,
-            '_view_count:': 0,
-            '_created_by_user': '',
-            '_created_date_time': datetime.utcnow()
+            'view_count:': 0,
+            'created_by_user': '',
+            'created_date_time': datetime.utcnow()
         })
 
         return '[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED

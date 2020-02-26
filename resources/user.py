@@ -49,10 +49,10 @@ class User(Resource):
         users.update_one({ '_id': object_id },
         {
             '$push': {
-                '_changes': {
-                    '_fields': fields,
-                    '_updated_by_user': '',
-                    '_updated_date_time': datetime.utcnow()
+                'changes': {
+                    'fields': fields,
+                    'updated_by_user': '',
+                    'updated_date_time': datetime.utcnow()
                 }
             }
         })
@@ -95,8 +95,8 @@ class UserList(Resource):
                 'password_salt': password_salt,
                 'phone': args['phone'],
                 'published:': True,
-                '_created_by_user': args['email'],
-                '_created_date_time': datetime.utcnow()
+                'created_by_user': args['email'],
+                'created_date_time': datetime.utcnow()
             })
 
             return '[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED
