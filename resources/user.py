@@ -54,7 +54,7 @@ class User(Resource):
                 'changes': {
                     'fields': fields,
                     'updated_by_user': user_id,
-                    'updated_date_time': datetime.utcnow()
+                    'updated_datetime': datetime.utcnow()
                 }
             }
         })
@@ -97,7 +97,7 @@ class UserList(Resource):
                 'password_salt': password_salt,
                 'phone': args['phone'],
                 'published:': True,
-                'created_date_time': datetime.utcnow()
+                'created_datetime': datetime.utcnow()
             }).inserted_id
 
             mongo.db.users.update_one({ '_id': inserted_id }, 

@@ -9,8 +9,8 @@ from db import mongo
 
 base_parser = reqparse.RequestParser()
 base_parser.add_argument('name', required=True, location='json')
-base_parser.add_argument('start_date_time', required=True, location='json')
-base_parser.add_argument('end_date_time', required=True, location='json')
+base_parser.add_argument('start_datetime', required=True, location='json')
+base_parser.add_argument('end_datetime', required=True, location='json')
 base_parser.add_argument('max_guests_allowed', required=True, type=int, location='json')
 base_parser.add_argument('cuisine', required=True, action='append', location='json')
 base_parser.add_argument('price_per_person', required=True, type=float, location='json')
@@ -53,7 +53,7 @@ class Event(Resource):
                 'changes': {
                     'fields': fields,
                     'updated_by_user': user_id,
-                    'updated_date_time': datetime.utcnow()
+                    'updated_datetime': datetime.utcnow()
                 }
             }
         })
@@ -84,8 +84,8 @@ class EventList(Resource):
         events.insert_one({
             'host_id': user_id,
             'name': args['name'],
-            'start_date_time': args['start_date_time'],
-            'end_date_time': args['end_date_time'],
+            'start_datetime': args['start_datetime'],
+            'end_datetime': args['end_datetime'],
             'max_guests_allowed': args['max_guests_allowed'],
             'cuisine': args['cuisine'],
             'price_per_person': args['price_per_person'],
@@ -93,7 +93,7 @@ class EventList(Resource):
             'published:': True,
             'view_count:': 0,
             'created_by_user': user_id,
-            'created_date_time': datetime.utcnow()
+            'created_datetime': datetime.utcnow()
         })
 
         return '[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED
