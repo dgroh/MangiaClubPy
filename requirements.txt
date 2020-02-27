@@ -4,3 +4,4 @@ flask_pymongo
 bson
 bcrypt
 pyjwt
+redis

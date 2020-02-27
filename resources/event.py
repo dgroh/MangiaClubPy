@@ -17,6 +17,7 @@ base_parser.add_argument('price_per_person', required=True, type=float, location
 base_parser.add_argument('description', required=True, location='json')
 
 class Event(Resource):
+
     def __init__(self):
         self.parser = base_parser.copy()
 
@@ -62,6 +63,7 @@ class Event(Resource):
 
 
 class EventList(Resource):
+    
     def __init__(self):
         self.parser = base_parser.copy()
 

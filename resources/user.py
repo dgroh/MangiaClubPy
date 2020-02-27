@@ -16,6 +16,7 @@ base_parser.add_argument('password', required=True, location='json')
 base_parser.add_argument('phone', required=True, location='json')
 
 class User(Resource):
+    
     def __init__(self):
         self.parser = base_parser.copy()
 
@@ -63,6 +64,7 @@ class User(Resource):
 
 
 class UserList(Resource):
+
     def __init__(self):
         self.parser = base_parser.copy()
 
