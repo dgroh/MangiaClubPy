@@ -15,13 +15,14 @@ base_parser.add_argument('last_name', required=True, location='json')
 base_parser.add_argument('password', required=True, location='json')
 base_parser.add_argument('phone', required=True, location='json')
 
+
 class User(Resource):
-    
+
     def __init__(self):
         self.parser = base_parser.copy()
 
         for arg in self.parser.args:
-            arg.required=False
+            arg.required = False
 
         self.parser.add_argument('is_host', type=bool, location='json')
         self.parser.add_argument('rating', location='json')
@@ -29,7 +30,7 @@ class User(Resource):
     def get(self, id):
         object_id = ObjectId(id)
 
-        user = mongo.db.users.find_one_or_404({ '_id': object_id })
+        user = mongo.db.users.find_one_or_404({'_id': object_id})
 
         user['_id'] = str(user['_id'])
         user['hashed_password'] = user['hashed_password'].decode('utf-8')
@@ -45,12 +46,13 @@ class User(Resource):
 
         users = mongo.db.users
 
-        users.find_one_or_404({ '_id': object_id })
+        users.find_one_or_404({'_id': object_id})
 
-        fields = { key: value for key,value in args.items() if value is not None }
+        fields = {key: value for key,
+                  value in args.items() if value is not None}
 
-        users.update_one({ '_id': object_id },
-        {
+        users.update_one({'_id': object_id},
+                         {
             '$push': {
                 'changes': {
                     'fields': fields,
@@ -76,7 +78,7 @@ class UserList(Resource):
             user['_id'] = str(user['_id'])
             user['hashed_password'] = user['hashed_password'].decode('utf-8')
             user['password_salt'] = user['password_salt'].decode('utf-8')
-            
+
             response.append(user)
 
         return make_response({'data': response}, HttpStatusCode.HTTP_200_OK)
@@ -84,12 +86,13 @@ class UserList(Resource):
     def post(self):
         args = self.parser.parse_args()
 
-        existing_user = mongo.db.users.find_one({ 'email': args['email'] })
+        existing_user = mongo.db.users.find_one({'email': args['email']})
 
         if existing_user is None:
             password_salt = bcrypt.gensalt()
 
-            hashed_password = bcrypt.hashpw(args['password'].encode('utf-8'), password_salt)
+            hashed_password = bcrypt.hashpw(
+                args['password'].encode('utf-8'), password_salt)
 
             inserted_id = mongo.db.users.insert_one({
                 'email': args['email'],
@@ -102,10 +105,10 @@ class UserList(Resource):
                 'created_datetime': datetime.utcnow()
             }).inserted_id
 
-            mongo.db.users.update_one({ '_id': inserted_id }, 
-            { 
+            mongo.db.users.update_one({'_id': inserted_id},
+                                      {
                 '$set': {
-                    'created_by_user': str(inserted_id) 
+                    'created_by_user': str(inserted_id)
                 }
             })
 

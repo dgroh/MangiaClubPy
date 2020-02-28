@@ -16,13 +16,14 @@ base_parser.add_argument('cuisine', required=True, action='append', location='js
 base_parser.add_argument('price_per_person', required=True, type=float, location='json')
 base_parser.add_argument('description', required=True, location='json')
 
+
 class Event(Resource):
 
     def __init__(self):
         self.parser = base_parser.copy()
 
         for arg in self.parser.args:
-            arg.required=False
+            arg.required = False
 
         self.parser.add_argument('guests', action='append', location='json')
         self.parser.add_argument('rating', location='json')
@@ -46,10 +47,11 @@ class Event(Resource):
 
         events.find_one_or_404({'_id': object_id})
 
-        fields = {key: value for key,value in args.items() if value is not None}
+        fields = {key: value for key,
+                  value in args.items() if value is not None}
 
         events.update_one({'_id': object_id},
-        {
+                          {
             '$push': {
                 'changes': {
                     'fields': fields,
@@ -63,7 +65,7 @@ class Event(Resource):
 
 
 class EventList(Resource):
-    
+
     def __init__(self):
         self.parser = base_parser.copy()
 
