@@ -6,6 +6,9 @@ from resources.user import User, UserList
 from resources.auth import Login, Logout
 
 app = Flask(__name__)
+
+app.config.from_pyfile(f"config/{app.config['ENV']}.cfg")
+
 api = Api(app)
 
 ##
