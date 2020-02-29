@@ -1,12 +1,12 @@
 from datetime import datetime
-from flask import Flask, make_response
+from flask import make_response
 from flask_restful import Resource, reqparse
 from bson import ObjectId
 import bcrypt
 
-from . import HttpStatusCode
+from .constants import HttpStatusCode
 from .auth import token_required
-from db import mongo
+from api.db import mongo
 
 base_parser = reqparse.RequestParser()
 base_parser.add_argument('email', required=True, location='json')

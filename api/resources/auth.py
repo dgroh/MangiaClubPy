@@ -1,18 +1,17 @@
-from flask import Flask, make_response, request
+from flask import make_response, request
 from flask_restful import Resource, reqparse
 from datetime import datetime, timedelta
 from functools import wraps
 from bson import ObjectId
 import jwt
-import json
 import bcrypt
-import uuid
-import os
 
-from . import HttpStatusCode
-from db import mongo, redis
+from main import app
+from .constants import HttpStatusCode
+from api.db import mongo, redis
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = app.config['SECRET_KEY']
+
 
 def token_required(f):
     @wraps(f)
@@ -50,6 +49,7 @@ def token_required(f):
         return f(self, user_id, *args, **kwargs)
 
     return decorated
+
 
 class Login(Resource):
 
