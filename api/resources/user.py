@@ -1,12 +1,12 @@
-from datetime import datetime
-from flask import make_response
+from flask import make_response, current_app as app
 from flask_restful import Resource, reqparse
+from datetime import datetime
 from bson import ObjectId
 import bcrypt
 
 from .constants import HttpStatusCode
 from .auth import token_required
-from api.db import mongo
+
 
 base_parser = reqparse.RequestParser()
 base_parser.add_argument('email', required=True, location='json')
@@ -30,7 +30,10 @@ class User(Resource):
     def get(self, id):
         object_id = ObjectId(id)
 
-        user = mongo.db.users.find_one_or_404({'_id': object_id})
+        user = app.mongo.db.users.find_one({'_id': object_id})
+
+        if not user:
+            return make_response('[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
 
         user['_id'] = str(user['_id'])
         user['hashed_password'] = user['hashed_password'].decode('utf-8')
@@ -44,7 +47,7 @@ class User(Resource):
 
         object_id = ObjectId(id)
 
-        users = mongo.db.users
+        users = app.mongo.db.users
 
         users.find_one_or_404({'_id': object_id})
 
@@ -72,7 +75,7 @@ class UserList(Resource):
 
     def get(self):
         response = []
-        users = mongo.db.users.find()
+        users = app.mongo.db.users.find()
 
         for user in users:
             user['_id'] = str(user['_id'])
@@ -86,14 +89,14 @@ class UserList(Resource):
     def post(self):
         args = self.parser.parse_args()
 
-        existing_user = mongo.db.users.find_one({'email': args['email']})
+        existing_user = app.mongo.db.users.find_one({'email': args['email']})
 
         if existing_user is None:
             password_salt = bcrypt.gensalt()
 
             hashed_password = bcrypt.hashpw(args['password'].encode('utf-8'), password_salt)
 
-            inserted_id = mongo.db.users.insert_one({
+            inserted_id = app.mongo.db.users.insert_one({
                 'email': args['email'],
                 'first_name': args['first_name'],
                 'last_name': args['last_name'],
@@ -104,7 +107,7 @@ class UserList(Resource):
                 'created_datetime': datetime.utcnow()
             }).inserted_id
 
-            mongo.db.users.update_one({'_id': inserted_id},
+            app.mongo.db.users.update_one({'_id': inserted_id},
                                       {
                 '$set': {
                     'created_by_user': str(inserted_id)

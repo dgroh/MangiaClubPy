@@ -1,4 +1,4 @@
-from flask import make_response, request
+from flask import make_response, request, current_app as app
 from flask_restful import Resource, reqparse
 from datetime import datetime, timedelta
 from functools import wraps
@@ -6,11 +6,7 @@ from bson import ObjectId
 import jwt
 import bcrypt
 
-from main import app
 from .constants import HttpStatusCode
-from api.db import mongo, redis
-
-SECRET_KEY = app.config['SECRET_KEY']
 
 
 def token_required(f):
@@ -25,19 +21,19 @@ def token_required(f):
             return make_response('[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
 
         try:
-            data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
 
             claim_sub = data['sub']
             claim_email = data['email']
 
-            token_alive = redis.get(claim_sub)
+            token_alive = app.redis.get(claim_sub)
 
             if not token_alive:
                 return make_response('[INVALID_TOKEN]', HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
 
             user_id = claim_sub.replace('auth|', '')
 
-            user = mongo.db.users.find_one({'_id': ObjectId(user_id), 'email': claim_email})
+            user = app.mongo.db.users.find_one({'_id': ObjectId(user_id), 'email': claim_email})
 
             if not user:
                 return make_response('[INVALID_TOKEN]', HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -63,9 +59,12 @@ class Login(Resource):
         email = args['email']
         password = args['password']
 
-        users = mongo.db.users
+        users = app.mongo.db.users
 
-        user = users.find_one_or_404({'email': email})
+        user = users.find_one({'email': email})
+
+        if not user:
+            return make_response('[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
 
         if bcrypt.checkpw(password.encode('utf-8'), user['hashed_password']):
             try:
@@ -81,9 +80,9 @@ class Login(Resource):
                     'phone:': user['phone']
                 }
 
-                token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+                token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
-                redis.setex(payload['sub'], int(expires_in.total_seconds()), token)
+                app.redis.setex(payload['sub'], int(expires_in.total_seconds()), token)
 
                 return make_response({'token': token}, HttpStatusCode.HTTP_201_CREATED)
             except Exception as e:
@@ -97,6 +96,6 @@ class Logout(Resource):
 
     @token_required
     def delete(self, user_id):
-        redis.delete(f'auth|{user_id}')
+        app.redis.delete(f'auth|{user_id}')
 
         return '[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT

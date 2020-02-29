@@ -1,11 +1,11 @@
-from datetime import datetime
-from flask import make_response
+from flask import make_response, current_app as app
 from flask_restful import Resource, reqparse
+from datetime import datetime
 from bson import ObjectId
 
 from .constants import HttpStatusCode
 from .auth import token_required
-from api.db import mongo
+
 
 base_parser = reqparse.RequestParser()
 base_parser.add_argument('name', required=True, location='json')
@@ -31,7 +31,10 @@ class Event(Resource):
     def get(self, id):
         object_id = ObjectId(id)
 
-        event = mongo.db.events.find_one_or_404({'_id': object_id})
+        event = app.mongo.db.events.find_one({'_id': object_id})
+
+        if not event:
+            return make_response('[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
 
         event['_id'] = str(event['_id'])
 
@@ -43,9 +46,12 @@ class Event(Resource):
 
         object_id = ObjectId(id)
 
-        events = mongo.db.events
+        events = app.mongo.db.events
 
-        events.find_one_or_404({'_id': object_id})
+        event = app.mongo.db.events.find_one({'_id': object_id})
+
+        if not event:
+            return make_response('[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
 
         fields = {key: value for key,
                   value in args.items() if value is not None}
@@ -71,7 +77,7 @@ class EventList(Resource):
 
     def get(self):
         response = []
-        events = mongo.db.events.find()
+        events = app.mongo.db.events.find()
 
         for event in events:
             event['_id'] = str(event['_id'])
@@ -83,7 +89,7 @@ class EventList(Resource):
     def post(self, user_id):
         args = self.parser.parse_args()
 
-        events = mongo.db.events
+        events = app.mongo.db.events
 
         events.insert_one({
             'host_id': user_id,
