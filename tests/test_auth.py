@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import BadRequest
 
-from api.resources.auth import Login
+from api.auth import Login
 
 
 @mock.patch('flask_restful.reqparse.request')
@@ -43,17 +43,17 @@ class TestLoginMethods(unittest.TestCase):
                                                             'body or the query string')
 
     def test_post_request_user_not_found(self, request_mock):
-        with mock.patch('api.resources.auth.app') as app:
+        with mock.patch('api.auth.app') as app:
             request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
             # TODO: WIP
 
     def test_post_request_wrong_password(self, request_mock):
-        with mock.patch('api.resources.auth.app'):
+        with mock.patch('api.auth.app'):
             request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
             # TODO: WIP
 
     def test_post_request_successful(self, request_mock):
-        with mock.patch('api.resources.auth.app'):
+        with mock.patch('api.auth.app'):
             request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
             # TODO: WIP
 

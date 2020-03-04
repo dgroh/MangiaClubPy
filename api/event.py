@@ -6,7 +6,6 @@ from bson import ObjectId
 from .constants import HttpStatusCode
 from .auth import token_required
 
-
 base_parser = reqparse.RequestParser()
 base_parser.add_argument('name', required=True, location='json')
 base_parser.add_argument('start_datetime', required=True, location='json')
