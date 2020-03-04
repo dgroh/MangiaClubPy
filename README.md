@@ -1,3 +1,6 @@
+
+[![CircleCI](https://circleci.com/gh/dgroh/mangia.club.svg?style=shield&circle-token=10082966a4c30b9470239b535563789cc0b2a54c)](https://circleci.com/gh/dgroh/mangia.club)
+
 # Mangia Club
 
 This is the repository of the API of the **Mangia Club App**
