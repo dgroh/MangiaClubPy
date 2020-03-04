@@ -1,16 +1,18 @@
-from flask_restful import Api
+from flask import Flask
+import redis
+from pymongo import MongoClient
 
-from .auth import Login, Logout
-from .event import EventList, Event
-from .user import UserList, User
+from .resources import init_resources
 
 
-def init_app(app):
-    api = Api(app)
+def create_app():
+    app = Flask(__name__)
 
-    api.add_resource(EventList, '/api/v1/events')
-    api.add_resource(Event, '/api/v1/events/<string:id>')
-    api.add_resource(UserList, '/api/v1/users')
-    api.add_resource(User, '/api/v1/users/<string:id>')
-    api.add_resource(Login, '/api/v1/auth/login')
-    api.add_resource(Logout, '/api/v1/auth/logout')
+    app.config.from_pyfile(f"config/{app.config['ENV']}.cfg")
+
+    app.redis = redis.Redis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'])
+    app.mongo = MongoClient(host=app.config['MONGO_DB_HOST'], port=int(app.config['MONGO_DB_PORT']))
+
+    init_resources(app)
+
+    return app

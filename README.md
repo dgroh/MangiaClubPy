@@ -28,14 +28,14 @@ From the root folder of the project inside the activated virtual environment cre
 On Windows
 
 ```bash
-set FLASK_APP=main.py
+set FLASK_APP=run.py
 set FLASK_ENV=development
 ```
 
 On Linux/Mac
 
 ```bash
-set FLASK_APP=main.py
+set FLASK_APP=run.py
 set FLASK_ENV=development
 ```
 

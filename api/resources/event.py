@@ -3,8 +3,8 @@ from flask_restful import Resource, reqparse
 from datetime import datetime
 from bson import ObjectId
 
-from .constants import HttpStatusCode
-from .auth import token_required
+from api.resources.constants import HttpStatusCode
+from api.resources.auth import token_required
 
 base_parser = reqparse.RequestParser()
 base_parser.add_argument('name', required=True, location='json')
