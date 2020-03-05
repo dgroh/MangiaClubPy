@@ -2,6 +2,7 @@ from flask import Flask
 
 from config import ProductionConfig, TestingConfig, DevelopmentConfig
 
+
 def create_app():
     app = Flask(__name__)
 
