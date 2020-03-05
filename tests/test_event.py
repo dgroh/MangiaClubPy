@@ -9,6 +9,9 @@ class TestEventMethods(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_get_event_invalid_id(self):
+        pass
+
     def test_get_event_not_found(self):
         pass
 

@@ -28,6 +28,9 @@ class Event(Resource):
         self.parser.add_argument('rating', location='json')
 
     def get(self, id):
+        if not ObjectId.is_valid(id):
+            return make_response('[HTTP_400_BAD_REQUEST]', HttpStatusCode.HTTP_400_BAD_REQUEST)
+
         object_id = ObjectId(id)
 
         event = app.mongo.db.events.find_one({'_id': object_id})
@@ -41,6 +44,9 @@ class Event(Resource):
 
     @token_required
     def put(self, user_id, id):
+        if not ObjectId.is_valid(id):
+            return make_response('[HTTP_400_BAD_REQUEST]', HttpStatusCode.HTTP_400_BAD_REQUEST)
+
         args = self.parser.parse_args()
 
         object_id = ObjectId(id)
