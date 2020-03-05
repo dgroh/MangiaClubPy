@@ -1,10 +1,8 @@
 import unittest
 from unittest import mock
-from unittest.mock import MagicMock
 
 import os
 import bcrypt
-import mongomock
 import jwt
 
 from datetime import datetime
@@ -14,17 +12,39 @@ from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import BadRequest
 
 from api import create_app
-from api.resources.auth import Login
+from api.resources.auth import Login, Logout
 from api.resources.constants import HttpStatusCode
 
 os.environ['FLASK_ENV'] = 'testing'
+
+
+def create_user(app):
+    """
+    Create a test user in mongomock to be used throughout the tests
+    """
+    password_salt = bcrypt.gensalt()
+
+    user = {
+        'email': 'foo@foo.com',
+        'first_name': 'foo',
+        'last_name': 'foo',
+        'hashed_password': bcrypt.hashpw('foo'.encode('utf-8'), password_salt),
+        'password_salt': password_salt,
+        'phone': '15162961189',
+        'published:': True,
+        'created_datetime': datetime.utcnow()
+    }
+
+    app.mongo.db.users.insert_one(user)
 
 
 @mock.patch('api.resources.auth.reqparse.request')
 class TestLoginMethods(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
-        self.app.mongo.db.users.insert_one(self.user)
+        
+        create_user(self.app)
+
         self.login = Login()
         pass
 
@@ -84,20 +104,20 @@ class TestLoginMethods(unittest.TestCase):
 
     @mock.patch('api.resources.auth.make_response')
     @mock.patch('api.resources.auth.datetime')
-    def test_post_request_successful(self, mock_datetime, make_response_mock, request_mock):
+    def test_post_request_successful(self, datetime_mock, make_response_mock, request_mock):
         with self.app.app_context():
             # Arrange
             request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
 
             user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
 
-            mock_datetime.utcnow = mock.Mock(return_value=datetime(1901, 12, 21))
+            datetime_mock.utcnow = mock.Mock(return_value=datetime(1901, 12, 21))
 
             expires_in = timedelta(days=60)
 
             expected_payload = {
-                'exp': mock_datetime.utcnow.return_value + expires_in,
-                'iat': mock_datetime.utcnow.return_value,
+                'exp': datetime_mock.utcnow.return_value + expires_in,
+                'iat': datetime_mock.utcnow.return_value,
                 'sub': f'auth|{str(user["_id"])}',
                 'email': user['email'],
                 'phone:': user['phone']
@@ -116,38 +136,59 @@ class TestLoginMethods(unittest.TestCase):
                                                     expected_token)
             make_response_mock.assert_called_with({'token': expected_token}, HttpStatusCode.HTTP_201_CREATED)
 
-    @property
-    def user(self):
-        password_salt = bcrypt.gensalt()
 
-        return {
-            'email': 'foo@foo.com',
-            'first_name': 'foo',
-            'last_name': 'foo',
-            'hashed_password': bcrypt.hashpw('foo'.encode('utf-8'), password_salt),
-            'password_salt': password_salt,
-            'phone': '15162961189',
-            'published:': True,
-            'created_datetime': datetime.utcnow()
-        }
-
-
+@mock.patch('api.resources.auth.request')
 class TestLogoutMethods(unittest.TestCase):
     def setUp(self):
-        # TODO: WIP
-        pass
+        self.app = create_app()
+        
+        create_user(self.app)
+
+        self.logout = Logout()
 
     def tearDown(self):
-        # TODO: WIP
         pass
 
-    def test_delete_without_token(self):
-        # TODO: WIP
-        pass
+    @mock.patch('api.resources.auth.make_response')
+    def test_delete_without_token(self, make_response_mock, request_mock):
+        # Act
+        self.logout.delete()
 
-    def test_delete_with_token(self):
-        # TODO: WIP
-        pass
+        # Assert
+        make_response_mock.assert_called_with('[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
+
+    def test_delete_with_token(self, request_mock):
+        with self.app.app_context():
+            # Arrange
+            user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
+
+            user_id = str(user["_id"])
+
+            expires_in = timedelta(days=60)
+
+            payload = {
+                'exp': datetime.utcnow() + expires_in,
+                'iat': datetime.utcnow(),
+                'sub': f'auth|{user_id}',
+                'email': user['email'],
+                'phone:': user['phone']
+            }
+
+            token = jwt.encode(payload, self.app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+            header = {'Access-Token': token}
+            request_mock.headers.__contains__.side_effect = header.__contains__
+            request_mock.headers.__getitem__.side_effect = header.__getitem__
+
+            self.app.redis = mock.Mock()
+            self.app.redis.get.return_value = token
+
+            # Act
+            result = self.logout.delete()
+
+            # Assert
+            self.app.redis.delete.assert_called_with(f'auth|{user_id}')
+            self.assertEqual(result, ('[HTTP_204_NO_CONTENT]', 204))
 
 
 if __name__ == '__main__':
