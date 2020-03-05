@@ -1,9 +1,6 @@
 from flask import Flask
 
-from api.db import init_db
-from api.resources import init_resources
 from config import ProductionConfig, TestingConfig, DevelopmentConfig
-
 
 def create_app():
     app = Flask(__name__)
@@ -18,11 +15,13 @@ def create_app():
     app.config.from_object(config)
 
     if not isinstance(config, type(TestingConfig)):
+        from api.resources import init_resources
+        from api.db import init_db
+
         init_db(app)
+        init_resources(app)
     else:
         from api.db import init_db_mock
         init_db_mock(app)
-
-    init_resources(app)
 
     return app
