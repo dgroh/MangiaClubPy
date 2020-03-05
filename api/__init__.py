@@ -1,16 +1,28 @@
-from flask_restful import Api
+from flask import Flask
 
-from .auth import Login, Logout
-from .event import EventList, Event
-from .user import UserList, User
+from config import ProductionConfig, TestingConfig, DevelopmentConfig
 
 
-def init_app(app):
-    api = Api(app)
+def create_app():
+    app = Flask(__name__)
 
-    api.add_resource(EventList, '/api/v1/events')
-    api.add_resource(Event, '/api/v1/events/<string:id>')
-    api.add_resource(UserList, '/api/v1/users')
-    api.add_resource(User, '/api/v1/users/<string:id>')
-    api.add_resource(Login, '/api/v1/auth/login')
-    api.add_resource(Logout, '/api/v1/auth/logout')
+    config = ProductionConfig
+
+    if app.config['ENV'] is 'development':
+        config = DevelopmentConfig
+    if app.config['ENV'] is 'testing':
+        config = TestingConfig
+
+    app.config.from_object(config)
+
+    if not isinstance(config, type(TestingConfig)):
+        from api.resources import init_resources
+        from api.db import init_db
+
+        init_db(app)
+        init_resources(app)
+    else:
+        from api.db import init_db_mock
+        init_db_mock(app)
+
+    return app

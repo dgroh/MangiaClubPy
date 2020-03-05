@@ -4,8 +4,8 @@ from datetime import datetime
 from bson import ObjectId
 import bcrypt
 
-from .constants import HttpStatusCode
-from .auth import token_required
+from api.resources.constants import HttpStatusCode
+from api.resources.auth import token_required
 
 
 base_parser = reqparse.RequestParser()

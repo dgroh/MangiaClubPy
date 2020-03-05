@@ -6,7 +6,7 @@ from bson import ObjectId
 import jwt
 import bcrypt
 
-from .constants import HttpStatusCode
+from api.resources.constants import HttpStatusCode
 
 
 def token_required(f):

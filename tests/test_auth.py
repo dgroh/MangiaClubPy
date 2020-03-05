@@ -2,19 +2,29 @@ import unittest
 from unittest import mock
 from unittest.mock import MagicMock
 
+import os
 import bcrypt
+import mongomock
+import jwt
+
+from datetime import datetime
+from datetime import timedelta
 
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import BadRequest
 
-from api.auth import Login
-from api.constants import HttpStatusCode
+from api import create_app
+from api.resources.auth import Login
+from api.resources.constants import HttpStatusCode
+
+os.environ['FLASK_ENV'] = 'testing'
 
 
-@mock.patch('api.auth.reqparse.request')
-@mock.patch('api.auth.reqparse.current_app', MagicMock())
+@mock.patch('api.resources.auth.reqparse.request')
 class TestLoginMethods(unittest.TestCase):
     def setUp(self):
+        self.app = create_app()
+        self.app.mongo.db.users.insert_one(self.user)
         self.login = Login()
         pass
 
@@ -22,76 +32,104 @@ class TestLoginMethods(unittest.TestCase):
         pass
 
     def test_post_request_without_args(self, request_mock):
-        self.assertRaises(BadRequest, self.login.post)
+        with self.app.app_context():
+            self.assertRaises(BadRequest, self.login.post)
 
     def test_post_request_without_email(self, request_mock):
-        # Arrange
-        request_mock.values.return_value = MultiDict([('password', 'foo')])
+        with self.app.app_context():
+            # Arrange
+            request_mock.values.return_value = MultiDict([('password', 'foo')])
 
-        # Act and Assert
-        with self.assertRaises(BadRequest) as e:
-            self.login.post()
-            self.assertEqual(e.data['message']['email'], 'Missing required parameter in the JSON body or the post '
-                                                         'body or the query string')
+            # Act and Assert
+            with self.assertRaises(BadRequest) as e:
+                self.login.post()
+                self.assertEqual(e.data['message']['email'], 'Missing required parameter in the JSON body or the post '
+                                                             'body or the query string')
 
     def test_post_request_without_password(self, request_mock):
-        # Arrange
-        request_mock.values.return_value = MultiDict([('email', 'foo@foo.com')])
-
-        # Act and Assert
-        with self.assertRaises(BadRequest) as e:
-            self.login.post()
-            self.assertEqual(e.data['message']['password'], 'Missing required parameter in the JSON body or the post '
-                                                            'body or the query string')
-
-    @mock.patch('api.auth.make_response')
-    def test_post_request_user_not_found(self, make_response_mock, request_mock):
-        with mock.patch('api.auth.app') as app:
+        with self.app.app_context():
             # Arrange
-            request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
-            app.mongo.db.users.find_one.return_value = None
-            
+            request_mock.values.return_value = MultiDict([('email', 'foo@foo.com')])
+
+            # Act and Assert
+            with self.assertRaises(BadRequest) as e:
+                self.login.post()
+                self.assertEqual(e.data['message']['password'],
+                                 'Missing required parameter in the JSON body or the post '
+                                 'body or the query string')
+
+    @mock.patch('api.resources.auth.make_response')
+    def test_post_request_user_not_found(self, make_response_mock, request_mock):
+        with self.app.app_context():
+            # Arrange
+            request_mock.values.return_value = MultiDict([('email', 'not_foo@foo.com'), ('password', 'foo')])
+
             # Act
             self.login.post()
-            
+
             # Assert
             make_response_mock.assert_called_with('[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
 
-    @mock.patch('api.auth.make_response')
+    @mock.patch('api.resources.auth.make_response')
     def test_post_request_wrong_password(self, make_response_mock, request_mock):
-        with mock.patch('api.auth.app') as app:
+        with self.app.app_context():
             # Arrange
-            hashed_password = bcrypt.hashpw('foo'.encode('utf-8'), bcrypt.gensalt())
             request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'not_foo')])
-            found_user = { "hashed_password": hashed_password }
-            app.mongo.db.users.find_one.return_value = found_user
 
             # Act
             self.login.post()
-            
+
             # Assert
             make_response_mock.assert_called_with('[HTTP_401_UNAUTHORIZED]', HttpStatusCode.HTTP_401_UNAUTHORIZED)
 
-
-    @mock.patch('api.auth.make_response')
-    @mock.patch('api.auth.jwt')
-    def test_post_request_successful(self, jwt_mock, make_response_mock, request_mock):
-        with mock.patch('api.auth.app') as app:
+    @mock.patch('api.resources.auth.make_response')
+    @mock.patch('api.resources.auth.datetime')
+    def test_post_request_successful(self, mock_datetime, make_response_mock, request_mock):
+        with self.app.app_context():
             # Arrange
-            hashed_password = bcrypt.hashpw('foo'.encode('utf-8'), bcrypt.gensalt())
             request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
-            found_user = {'_id': 'abcd1234', 'phone': '01234567789', 'hashed_password': hashed_password }
-            app.mongo.db.users.find_one.return_value = found_user
-            jwt_mock.encode.return_value = b'the_foo_token'
-            
+
+            user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
+
+            mock_datetime.utcnow = mock.Mock(return_value=datetime(1901, 12, 21))
+
+            expires_in = timedelta(days=60)
+
+            expected_payload = {
+                'exp': mock_datetime.utcnow.return_value + expires_in,
+                'iat': mock_datetime.utcnow.return_value,
+                'sub': f'auth|{str(user["_id"])}',
+                'email': user['email'],
+                'phone:': user['phone']
+            }
+
+            expected_token = jwt.encode(expected_payload, self.app.config['SECRET_KEY'], algorithm='HS256').decode(
+                'utf-8')
+
+            self.app.redis = mock.Mock()
+
             # Act
             self.login.post()
-            
+
             # Assert
-            # TODO: Assert if a real toke is returnin and if it has been passed to redis with token sub
-            jwt_mock.encode.assert_called()
-            app.redis.setex.assert_called()
-            make_response_mock.assert_called_with({'token': 'the_foo_token'}, HttpStatusCode.HTTP_201_CREATED)
+            self.app.redis.setex.assert_called_with(expected_payload['sub'], int(expires_in.total_seconds()),
+                                                    expected_token)
+            make_response_mock.assert_called_with({'token': expected_token}, HttpStatusCode.HTTP_201_CREATED)
+
+    @property
+    def user(self):
+        password_salt = bcrypt.gensalt()
+
+        return {
+            'email': 'foo@foo.com',
+            'first_name': 'foo',
+            'last_name': 'foo',
+            'hashed_password': bcrypt.hashpw('foo'.encode('utf-8'), password_salt),
+            'password_salt': password_salt,
+            'phone': '15162961189',
+            'published:': True,
+            'created_datetime': datetime.utcnow()
+        }
 
 
 class TestLogoutMethods(unittest.TestCase):
