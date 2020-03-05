@@ -49,7 +49,10 @@ class User(Resource):
 
         users = app.mongo.db.users
 
-        users.find_one_or_404({'_id': object_id})
+        user = app.mongo.db.users.find_one({'_id': object_id})
+
+        if not user:
+            return make_response('[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
 
         fields = {key: value for key,
                   value in args.items() if value is not None}
