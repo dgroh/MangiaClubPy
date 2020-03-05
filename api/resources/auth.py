@@ -96,6 +96,7 @@ class Logout(Resource):
 
     @token_required
     def delete(self, user_id):
+        # TODO: Blacklist the Token?
         app.redis.delete(f'auth|{user_id}')
 
         return '[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT
