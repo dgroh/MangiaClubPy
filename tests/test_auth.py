@@ -156,8 +156,7 @@ class TestLogoutMethods(unittest.TestCase):
             # Assert
             make_response_mock.assert_called_with('[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
 
-    @mock.patch('api.resources.auth.request')
-    def test_delete_auth_with_token(self, request_mock):
+    def test_delete_auth_with_token(self):
         with self.app.app_context():
             # Arrange
             user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
@@ -176,15 +175,9 @@ class TestLogoutMethods(unittest.TestCase):
 
             token = jwt.encode(payload, self.app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
-            header = {'Access-Token': token}
-            request_mock.headers.__contains__.side_effect = header.__contains__
-            request_mock.headers.__getitem__.side_effect = header.__getitem__
-
-            self.app.redis = mock.Mock()
-            self.app.redis.get.return_value = token
-
             # Act
-            result = self.logout.delete()
+            with self.app.test_request_context(environ_base={'HTTP_ACCESS_TOKEN': token}):
+                result = self.logout.delete()
 
             # Assert
             self.app.redis.delete.assert_called_with(f'auth|{user_id}')
