@@ -38,7 +38,6 @@ def create_user(app):
     app.mongo.db.users.insert_one(user)
 
 
-@mock.patch('api.resources.auth.reqparse.request')
 class TestLoginMethods(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
@@ -50,38 +49,39 @@ class TestLoginMethods(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_post_auth_login_without_request_args(self, request_mock):
-        with self.app.app_context():
+    def test_post_auth_login_without_request_args(self):
+        with self.app.test_request_context():
             self.assertRaises(BadRequest, self.login.post)
 
-    def test_post_auth_login_without_email(self, request_mock):
-        with self.app.app_context():
+    def test_post_auth_login_without_email(self):
+        with self.app.test_client() as request_ctx:
             # Arrange
-            request_mock.values.return_value = MultiDict([('password', 'foo')])
+            request_ctx.request.values = MultiDict([('password', 'foo')])
 
             # Act and Assert
-            with self.assertRaises(BadRequest) as e:
+            with self.assertRaises(BadRequest) as error_ctx:
                 self.login.post()
-                self.assertEqual(e.data['message']['email'], 'Missing required parameter in the JSON body or the post '
+                
+            self.assertEqual(error_ctx.exception.data['message']['email'], 'Missing required parameter in the JSON body or the post '
                                                              'body or the query string')
 
-    def test_post_auth_login_without_password(self, request_mock):
-        with self.app.app_context():
+    def test_post_auth_login_without_password(self):
+        with self.app.test_request_context() as request_ctx:
             # Arrange
-            request_mock.values.return_value = MultiDict([('email', 'foo@foo.com')])
+            request_ctx.request.values = MultiDict([('email', 'foo@foo.com')])
 
             # Act and Assert
-            with self.assertRaises(BadRequest) as e:
+            with self.assertRaises(BadRequest) as error_ctx:
                 self.login.post()
-                self.assertEqual(e.data['message']['password'],
-                                 'Missing required parameter in the JSON body or the post '
-                                 'body or the query string')
+            
+            self.assertEqual(error_ctx.exception.data['message']['password'], 'Missing required parameter in the JSON body or the post '
+                                                             'body or the query string')
 
     @mock.patch('api.resources.auth.make_response')
-    def test_post_auth_login_user_not_found(self, make_response_mock, request_mock):
-        with self.app.app_context():
+    def test_post_auth_login_user_not_found(self, make_response_mock):
+        with self.app.app_context() as app_ctx, self.app.test_request_context() as request_ctx:
             # Arrange
-            request_mock.values.return_value = MultiDict([('email', 'not_foo@foo.com'), ('password', 'foo')])
+            request_ctx.request.values = MultiDict([('email', 'not_foo@foo.com'), ('password', 'foo')])
 
             # Act
             self.login.post()
@@ -90,10 +90,10 @@ class TestLoginMethods(unittest.TestCase):
             make_response_mock.assert_called_with('[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
 
     @mock.patch('api.resources.auth.make_response')
-    def test_post_auth_login_wrong_password(self, make_response_mock, request_mock):
-        with self.app.app_context():
+    def test_post_auth_login_wrong_password(self, make_response_mock):
+        with self.app.app_context() as app_ctx, self.app.test_request_context() as request_ctx:
             # Arrange
-            request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'not_foo')])
+            request_ctx.request.values = MultiDict([('email', 'foo@foo.com'), ('password', 'not_foo')])
 
             # Act
             self.login.post()
@@ -103,10 +103,10 @@ class TestLoginMethods(unittest.TestCase):
 
     @mock.patch('api.resources.auth.make_response')
     @mock.patch('api.resources.auth.datetime')
-    def test_post_auth_login_successful(self, datetime_mock, make_response_mock, request_mock):
-        with self.app.app_context():
+    def test_post_auth_login_successful(self, datetime_mock, make_response_mock):
+        with self.app.app_context() as app_ctx, self.app.test_request_context() as request_ctx:
             # Arrange
-            request_mock.values.return_value = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
+            request_ctx.request.values = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
 
             user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
 
@@ -136,7 +136,6 @@ class TestLoginMethods(unittest.TestCase):
             make_response_mock.assert_called_with({'token': expected_token}, HttpStatusCode.HTTP_201_CREATED)
 
 
-@mock.patch('api.resources.auth.request')
 class TestLogoutMethods(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
@@ -149,13 +148,15 @@ class TestLogoutMethods(unittest.TestCase):
         pass
 
     @mock.patch('api.resources.auth.make_response')
-    def test_delete_auth_token_not_in_header(self, make_response_mock, request_mock):
-        # Act
-        self.logout.delete()
+    def test_delete_auth_token_not_in_header(self, make_response_mock):
+        with self.app.test_request_context():
+            # Act
+            self.logout.delete()
 
-        # Assert
-        make_response_mock.assert_called_with('[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
+            # Assert
+            make_response_mock.assert_called_with('[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
 
+    @mock.patch('api.resources.auth.request')
     def test_delete_auth_with_token(self, request_mock):
         with self.app.app_context():
             # Arrange

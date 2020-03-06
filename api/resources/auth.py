@@ -16,8 +16,7 @@ def token_required(f):
 
         if 'Access-Token' in request.headers:
             token = request.headers['Access-Token']
-
-        if not token:
+        else:
             return make_response('[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
 
         try:
