@@ -13,7 +13,10 @@ from werkzeug.exceptions import BadRequest
 
 from api import create_app
 from api.resources.auth import Login, Logout
-from api.resources.constants import HttpStatusCode
+from api.resources.constants import HttpStatusCode, Routes
+
+from tests.utils import CustomAssertions
+from flask.json import jsonify
 
 os.environ['FLASK_ENV'] = 'testing'
 
@@ -38,7 +41,7 @@ def create_user(app):
     app.mongo.db.users.insert_one(user)
 
 
-class TestLoginMethods(unittest.TestCase):
+class TestLoginMethods(unittest.TestCase, CustomAssertions):
     def setUp(self):
         self.app = create_app()
         
@@ -77,37 +80,26 @@ class TestLoginMethods(unittest.TestCase):
             self.assertEqual(error_ctx.exception.data['message']['password'], 'Missing required parameter in the JSON body or the post '
                                                              'body or the query string')
 
-    @mock.patch('api.resources.auth.make_response')
-    def test_post_auth_login_user_not_found(self, make_response_mock):
-        with self.app.app_context() as app_ctx, self.app.test_request_context() as request_ctx:
-            # Arrange
-            request_ctx.request.values = MultiDict([('email', 'not_foo@foo.com'), ('password', 'foo')])
-
+    def test_post_auth_login_user_not_found(self):
+        with self.app.test_client() as client:
             # Act
-            self.login.post()
+            response = client.post(Routes.LOGIN_V1, json={'email': 'not_foo@foo.com', 'password': 'foo'})
 
             # Assert
-            make_response_mock.assert_called_with('[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
+            self.assert_response(response, b'[HTTP_404_NOT_FOUND]', HttpStatusCode.HTTP_404_NOT_FOUND)
 
-    @mock.patch('api.resources.auth.make_response')
-    def test_post_auth_login_wrong_password(self, make_response_mock):
-        with self.app.app_context() as app_ctx, self.app.test_request_context() as request_ctx:
-            # Arrange
-            request_ctx.request.values = MultiDict([('email', 'foo@foo.com'), ('password', 'not_foo')])
-
+    def test_post_auth_login_wrong_password(self):
+        with self.app.test_client() as client:
             # Act
-            self.login.post()
+            response = client.post(Routes.LOGIN_V1, json={'email': 'foo@foo.com', 'password': 'not_foo'})
 
             # Assert
-            make_response_mock.assert_called_with('[HTTP_401_UNAUTHORIZED]', HttpStatusCode.HTTP_401_UNAUTHORIZED)
+            self.assert_response(response, b'[HTTP_401_UNAUTHORIZED]', HttpStatusCode.HTTP_401_UNAUTHORIZED)
 
-    @mock.patch('api.resources.auth.make_response')
     @mock.patch('api.resources.auth.datetime')
-    def test_post_auth_login_successful(self, datetime_mock, make_response_mock):
-        with self.app.app_context() as app_ctx, self.app.test_request_context() as request_ctx:
+    def test_post_auth_login_successful(self, datetime_mock):
+        with self.app.test_client() as client:
             # Arrange
-            request_ctx.request.values = MultiDict([('email', 'foo@foo.com'), ('password', 'foo')])
-
             user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
 
             datetime_mock.utcnow = mock.Mock(return_value=datetime(1901, 12, 21))
@@ -128,15 +120,15 @@ class TestLoginMethods(unittest.TestCase):
             self.app.redis = mock.Mock()
 
             # Act
-            self.login.post()
+            response = client.post(Routes.LOGIN_V1, json={'email': 'foo@foo.com', 'password': 'foo'})
 
             # Assert
             self.app.redis.setex.assert_called_with(expected_payload['sub'], int(expires_in.total_seconds()),
                                                     expected_token)
-            make_response_mock.assert_called_with({'token': expected_token}, HttpStatusCode.HTTP_201_CREATED)
+            self.assert_response(response, jsonify({'token': expected_token}).data, HttpStatusCode.HTTP_201_CREATED)
 
 
-class TestLogoutMethods(unittest.TestCase):
+class TestLogoutMethods(unittest.TestCase, CustomAssertions):
     def setUp(self):
         self.app = create_app()
         
@@ -147,17 +139,16 @@ class TestLogoutMethods(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @mock.patch('api.resources.auth.make_response')
-    def test_delete_auth_token_not_in_header(self, make_response_mock):
-        with self.app.test_request_context():
+    def test_delete_auth_token_not_in_header(self):
+        with self.app.test_client() as client:
             # Act
-            self.logout.delete()
+            response = client.delete(Routes.LOGOUT_V1)
 
             # Assert
-            make_response_mock.assert_called_with('[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
+            self.assert_response(response, b'[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
 
     def test_delete_auth_with_token(self):
-        with self.app.app_context():
+        with self.app.test_client() as client:
             # Arrange
             user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
 
@@ -176,12 +167,11 @@ class TestLogoutMethods(unittest.TestCase):
             token = jwt.encode(payload, self.app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
             # Act
-            with self.app.test_request_context(environ_base={'HTTP_ACCESS_TOKEN': token}):
-                result = self.logout.delete()
+            response = client.delete(Routes.LOGOUT_V1, headers={ 'Access-Token': token })
 
             # Assert
             self.app.redis.delete.assert_called_with(f'auth|{user_id}')
-            self.assertEqual(result, ('[HTTP_204_NO_CONTENT]', 204))
+            self.assert_response(response, b'', HttpStatusCode.HTTP_204_NO_CONTENT)
 
 
 if __name__ == '__main__':
