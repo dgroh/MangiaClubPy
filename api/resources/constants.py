@@ -37,6 +37,7 @@ class HttpStatusCode:
     HTTP_505_HTTP_VERSION_NOT_SUPPORTED = 505
     HTTP_511_NETWORK_AUTHENTICATION_REQUIRED = 511
 
+
 class Routes:
     EVENTS_V1 = '/api/v1/events'
     USERS_V1 = '/api/v1/users'

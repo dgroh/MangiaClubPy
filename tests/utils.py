@@ -4,6 +4,7 @@ import bcrypt
 
 from datetime import datetime, timedelta
 
+
 def create_user(app):
     """
     Create a test user in mongomock to be used throughout the tests
@@ -48,6 +49,7 @@ def create_token(user, expiration: int, secret: str):
     }
 
     return jwt.encode(payload, secret, algorithm='HS256').decode('utf-8')
+
 
 class CustomAssertions:
     def __init__(self):
