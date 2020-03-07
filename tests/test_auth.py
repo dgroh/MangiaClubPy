@@ -54,7 +54,7 @@ class TestLoginMethods(unittest.TestCase):
             self.assertRaises(BadRequest, self.login.post)
 
     def test_post_auth_login_without_email(self):
-        with self.app.test_client() as request_ctx:
+        with self.app.test_request_context() as request_ctx:
             # Arrange
             request_ctx.request.values = MultiDict([('password', 'foo')])
 
