@@ -15,30 +15,10 @@ from api import create_app
 from api.resources.auth import Login, Logout
 from api.resources.constants import HttpStatusCode, Routes
 
-from tests.utils import CustomAssertions
+from tests.utils import CustomAssertions, create_token, create_user
 from flask.json import jsonify
 
 os.environ['FLASK_ENV'] = 'testing'
-
-
-def create_user(app):
-    """
-    Create a test user in mongomock to be used throughout the tests
-    """
-    password_salt = bcrypt.gensalt()
-
-    user = {
-        'email': 'foo@foo.com',
-        'first_name': 'foo',
-        'last_name': 'foo',
-        'hashed_password': bcrypt.hashpw('foo'.encode('utf-8'), password_salt),
-        'password_salt': password_salt,
-        'phone': '15162961189',
-        'published:': True,
-        'created_datetime': datetime.utcnow()
-    }
-
-    app.mongo.db.users.insert_one(user)
 
 
 class TestLoginMethods(unittest.TestCase, CustomAssertions):
@@ -114,10 +94,9 @@ class TestLoginMethods(unittest.TestCase, CustomAssertions):
                 'phone:': user['phone']
             }
 
+            # TODO: Consider using create_token from utils. This is an edge case because of the mocked datetime
             expected_token = jwt.encode(expected_payload, self.app.config['SECRET_KEY'], algorithm='HS256').decode(
                 'utf-8')
-
-            self.app.redis = mock.Mock()
 
             # Act
             response = client.post(Routes.LOGIN_V1, json={'email': 'foo@foo.com', 'password': 'foo'})
@@ -154,18 +133,7 @@ class TestLogoutMethods(unittest.TestCase, CustomAssertions):
 
             user_id = str(user["_id"])
 
-            expires_in = timedelta(days=60)
-
-            payload = {
-                'exp': datetime.utcnow() + expires_in,
-                'iat': datetime.utcnow(),
-                'sub': f'auth|{user_id}',
-                'email': user['email'],
-                'phone:': user['phone']
-            }
-
-            token = jwt.encode(payload, self.app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
-
+            token = create_token(user, 60, self.app.config['SECRET_KEY'])
             # Act
             response = client.delete(Routes.LOGOUT_V1, headers={ 'Access-Token': token })
 

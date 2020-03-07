@@ -28,14 +28,14 @@ def token_required(f):
             token_alive = app.redis.get(claim_sub)
 
             if not token_alive:
-                return make_response('[INVALID_TOKEN]', HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
+                return make_response('[INVALID_TOKEN]', HttpStatusCode.HTTP_400_BAD_REQUEST)
 
             user_id = claim_sub.replace('auth|', '')
 
             user = app.mongo.db.users.find_one({'_id': ObjectId(user_id), 'email': claim_email})
 
             if not user:
-                return make_response('[INVALID_TOKEN]', HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
+                return make_response('[INVALID_TOKEN]', HttpStatusCode.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             # TODO: Log the exception

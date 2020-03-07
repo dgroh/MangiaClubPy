@@ -63,16 +63,17 @@ class User(Resource):
         fields = {key: value for key,
                   value in args.items() if value is not None}
 
-        users.update_one({'_id': object_id},
-                         {
-            '$push': {
-                'changes': {
-                    'fields': fields,
-                    'updated_by_user': user_id,
-                    'updated_datetime': datetime.utcnow()
+        if len(fields):
+            users.update_one({'_id': object_id},
+                            {
+                '$push': {
+                    'changes': {
+                        'fields': fields,
+                        'updated_by_user': user_id,
+                        'updated_datetime': datetime.utcnow()
+                    }
                 }
-            }
-        })
+            })
 
         return '[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT
 

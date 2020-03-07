@@ -9,9 +9,9 @@ from api.resources.constants import Routes
 def init_resources(app):
     api = Api(app)
 
-    api.add_resource(EventList, Routes.GET_ALL_EVENTS_V1)
-    api.add_resource(Event, Routes.GET_EVENT_BY_ID_V1)
-    api.add_resource(UserList, Routes.GET_ALL_USERS_V1)
-    api.add_resource(User, Routes.GET_USER_BY_ID_V1)
+    api.add_resource(EventList, Routes.EVENTS_V1)
+    api.add_resource(Event, f'{Routes.EVENTS_V1}/<string:id>')
+    api.add_resource(UserList, Routes.USERS_V1)
+    api.add_resource(User, f'{Routes.USERS_V1}/<string:id>')
     api.add_resource(Login, Routes.LOGIN_V1)
     api.add_resource(Logout, Routes.LOGOUT_V1)

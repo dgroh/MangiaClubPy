@@ -38,9 +38,7 @@ class HttpStatusCode:
     HTTP_511_NETWORK_AUTHENTICATION_REQUIRED = 511
 
 class Routes:
-    GET_ALL_EVENTS_V1 = '/api/v1/events'
-    GET_EVENT_BY_ID_V1 = '/api/v1/events/<string:id>'
-    GET_ALL_USERS_V1 = '/api/v1/users'
-    GET_USER_BY_ID_V1 = '/api/v1/users<string:id>'
+    EVENTS_V1 = '/api/v1/events'
+    USERS_V1 = '/api/v1/users'
     LOGIN_V1 = '/api/v1/auth/login'
     LOGOUT_V1 = '/api/v1/auth/logout'
