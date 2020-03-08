@@ -124,6 +124,6 @@ class UserList(Resource):
                 }
             })
 
-            return '[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED
+            return make_response('[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED)
 
-        return '[HTTP_409_CONFLICT]', HttpStatusCode.HTTP_409_CONFLICT
+        return make_response('[HTTP_409_CONFLICT]', HttpStatusCode.HTTP_409_CONFLICT)
