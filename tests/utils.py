@@ -29,8 +29,6 @@ def create_token(user, expiration: int, secret: str):
     """
     Creates a jwt token for the test user
 
-    Keyword arguments:
-
     :param user: The user to be encoded (`_id`, `email` and `phone` are required attributes). 
     :param expiration: The expiration in days
     :param secret: The token secret
@@ -62,13 +60,10 @@ class CustomAssertions:
     def assert_response(self, response, data: bytes, status_code: int):
         """
         Asserts a response message based on the message and status code returned from the test_client.
-        
-        Keyword arguments:
 
         :param response: The response result of the client call
         :param data: The message data expected from the response
         :param status_code: The http status code expected from the response
-
 
         ```
         def test_name(self):
@@ -79,8 +74,7 @@ class CustomAssertions:
                 # Assert
                 self.assert_response(response, 'Access Forbidden', 403)
         ```
-
-
         """
+        
         self.assertEqual(response.data, data)
         self.assertEqual(response.status_code, status_code)
