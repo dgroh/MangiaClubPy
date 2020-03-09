@@ -7,6 +7,8 @@ from config import ProductionConfig, TestingConfig, DevelopmentConfig
 def create_app():
     app = Flask(__name__)
 
+    init_resources(app)
+    
     config = ProductionConfig
 
     if app.config['ENV'] is 'development':
@@ -16,13 +18,12 @@ def create_app():
 
     app.config.from_object(config)
 
-    init_resources(app)
-
-    if not isinstance(config, type(TestingConfig)):
-        from api.db import init_db
-        init_db(app)
-    else:
+    # TODO: This code smells. Consider moving this responsability to the config object.    
+    if app.config['ENV'] == 'testing':
         from api.db import init_db_mock
         init_db_mock(app)
+    else:
+        from api.db import init_db
+        init_db(app)
 
     return app
