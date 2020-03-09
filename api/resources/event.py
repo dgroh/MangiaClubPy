@@ -111,4 +111,4 @@ class EventList(Resource):
             'created_datetime': datetime.utcnow()
         })
 
-        return '[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED
+        return make_response('[HTTP_201_CREATED]', HttpStatusCode.HTTP_201_CREATED)

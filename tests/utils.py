@@ -5,6 +5,30 @@ import bcrypt
 from datetime import datetime, timedelta
 
 
+def create_event(app, user_id):
+    """
+    Create a test event in mongomock to be used throughout the tests
+    """
+
+    event = {
+        'host_id': user_id,
+        'name': 'foo',
+        'start_datetime': datetime.utcnow().replace(hour=18),
+        'end_datetime': datetime.utcnow().replace(hour=23),
+        'max_guests_allowed': 6,
+        'cuisine': ['Japanese'],
+        'price_per_person': 16.0,
+        'description': 'Japanese food by foo',
+        'published:': True,
+        'view_count:': 0,
+        'created_by_user': user_id,
+        'created_datetime': datetime.utcnow()
+    }
+
+    inserted_id = app.mongo.db.events.insert_one(event).inserted_id
+
+    return app.mongo.db.events.find_one({ '_id': inserted_id })
+
 def create_user(app):
     """
     Create a test user in mongomock to be used throughout the tests
@@ -23,6 +47,8 @@ def create_user(app):
     }
 
     app.mongo.db.users.insert_one(user)
+
+    return app.mongo.db.users.find_one({ 'email': user['email'] })
 
 
 def create_token(user, expiration: int, secret: str):

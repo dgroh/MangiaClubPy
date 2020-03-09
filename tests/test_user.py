@@ -14,7 +14,7 @@ class TestUserMethods(unittest.TestCase, CustomAssertions):
     def setUp(self):
         self.app = create_app()
 
-        create_user(self.app)
+        self.user = create_user(self.app)
 
     def tearDown(self):
         pass
@@ -41,7 +41,7 @@ class TestUserMethods(unittest.TestCase, CustomAssertions):
     def test_get_user_successful(self):
         with self.app.test_client() as client:
             # Arrange
-            expected_user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
+            expected_user = self.user
             expected_user['_id'] = str(expected_user['_id'])
             expected_user['hashed_password'] = expected_user['hashed_password'].decode('utf-8')
             expected_user['password_salt'] = expected_user['password_salt'].decode('utf-8')
@@ -54,40 +54,18 @@ class TestUserMethods(unittest.TestCase, CustomAssertions):
 
     def test_put_user_without_token(self):
         with self.app.test_client() as client:
-            # Arrange
-            user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
-
             # Act
-            response = client.put(f'{Routes.USERS_V1}/{str(user["_id"])}')
+            response = client.put(f'{Routes.USERS_V1}/{str(self.user["_id"])}')
 
             # Assert
             self.assert_response(response, b'[HTTP_403_FORBIDDEN]', HttpStatusCode.HTTP_403_FORBIDDEN)
 
-    def test_put_user_not_found(self):
-        with self.app.test_client() as client:
-            # Arrange
-            random_id = str(ObjectId())
-
-            user = {'_id': random_id, 'email': 'foo@foo.com', 'phone': '+4915162961189'}
-
-            token = create_token(user, 60, self.app.config['SECRET_KEY'])
-
-            self.app.redis.get.return_value = token
-
-            # Act
-            response = client.put(f'{Routes.USERS_V1}/{random_id}', headers={'Access-Token': token})
-
-            # Assert
-            self.assert_response(response, b'[INVALID_TOKEN]', HttpStatusCode.HTTP_400_BAD_REQUEST)
-
     def test_put_user_token_expired(self):
         with self.app.test_client() as client:
             # Arrange
-            user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
+            user_id = str(self.user['_id'])
 
-            user_id = str(user['_id'])
-
-            token = create_token(user, -1, self.app.config['SECRET_KEY'])
+            token = create_token(self.user, -1, self.app.config['SECRET_KEY'])
 
             self.app.redis.get.return_value = token
 
@@ -100,11 +78,9 @@ class TestUserMethods(unittest.TestCase, CustomAssertions):
     def test_put_user_successful(self):
         with self.app.test_client() as client:
             # Arrange
-            user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
+            user_id = str(self.user['_id'])
 
-            user_id = str(user['_id'])
-
-            token = create_token(user, 60, self.app.config['SECRET_KEY'])
+            token = create_token(self.user, 60, self.app.config['SECRET_KEY'])
 
             self.app.redis.get.return_value = token
 
@@ -116,7 +92,7 @@ class TestUserMethods(unittest.TestCase, CustomAssertions):
             # Assert
             self.assert_response(response, b'', HttpStatusCode.HTTP_204_NO_CONTENT)
 
-            user = self.app.mongo.db.users.find_one({'email': 'foo@foo.com'})
+            user = self.app.mongo.db.users.find_one({'_id': self.user['_id']})
             # TODO: Review this syntax of accessing collection and potentially check phone against user 'collection-view / consolidate-collection'
             self.assertEqual(user['changes'][0]['fields']['phone'], fields['phone'])
 
@@ -141,8 +117,7 @@ class TestUserListMethods(unittest.TestCase, CustomAssertions):
                 user['_id'] = str(user['_id'])
                 user['hashed_password'] = user['hashed_password'].decode('utf-8')
                 user['password_salt'] = user['password_salt'].decode('utf-8')
-
-            users.append(user)
+                users.append(user)
 
             # Act
             response = client.get(Routes.USERS_V1)
@@ -156,7 +131,7 @@ class TestUserListMethods(unittest.TestCase, CustomAssertions):
             response = client.post(Routes.USERS_V1)
 
             # Assert
-            self.assertIsNotNone(response.json['message'].get('email'))
+            self.assertIsNotNone(response.json['message'])
 
     def test_post_user_already_exists(self):
         with self.app.test_client() as client:
