@@ -18,7 +18,6 @@ def create_app():
 
     app.config.from_object(config)
 
-    # TODO: This code smells. Consider moving this responsability to the config object.    
     if app.config['ENV'] == 'testing':
         from api.db import init_db_mock
         init_db_mock(app)
