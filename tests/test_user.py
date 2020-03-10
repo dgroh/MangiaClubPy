@@ -1,13 +1,14 @@
 import unittest
+import os
 
 from flask import jsonify
-
 from bson import ObjectId
 
 from api import create_app
 from api.resources.constants import HttpStatusCode, Routes
-
 from tests.utils import CustomAssertions, create_token, create_user
+
+os.environ['FLASK_ENV'] = 'testing'
 
 
 class TestUserMethods(unittest.TestCase, CustomAssertions):

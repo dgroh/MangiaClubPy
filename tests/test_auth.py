@@ -1,20 +1,16 @@
 import unittest
-from unittest import mock
-
 import os
 import jwt
 
+from unittest import mock
+from flask.json import jsonify
 from datetime import datetime
 from datetime import timedelta
-
-from werkzeug.datastructures import MultiDict
-from werkzeug.exceptions import BadRequest
 
 from api import create_app
 from api.resources.constants import HttpStatusCode, Routes
 
 from tests.utils import CustomAssertions, create_token, create_user
-from flask.json import jsonify
 
 os.environ['FLASK_ENV'] = 'testing'
 
