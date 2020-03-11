@@ -92,7 +92,7 @@ If a `docstring` has been changed, run:
 $ pdoc api --html -o docs --force
 ```
 
-This will update the current [index.html](docs/index.html)
+This will update the current [index.html](docs/api/index.html)
 
 ## Built With
 
