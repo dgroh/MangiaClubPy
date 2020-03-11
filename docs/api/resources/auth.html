@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.5" />
 <title>api.resources.auth API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Auth module which is responsible for the user authentication and authorization" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,11 +20,16 @@
 <h1 class="title">Module <code>api.resources.auth</code></h1>
 </header>
 <section id="section-intro">
+<p>Auth module which is responsible for the user authentication and authorization</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from flask import make_response, request, current_app as app
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34; Auth module which is responsible for the user authentication and authorization
+&#34;&#34;&#34;
+
+from flask import make_response, request, current_app as app
 from flask_restful import Resource, reqparse
 from datetime import datetime, timedelta
 from functools import wraps
@@ -36,6 +41,28 @@ from api.resources.constants import HttpStatusCode
 
 
 def token_required(f):
+    &#34;&#34;&#34;
+    This function defines a function decorator to be used in API routes where a a token is required.
+    In case the token is not valid or token is not present in header, the decorated function won&#39;t be executed
+
+    __Example__:
+
+    ```
+    class EventList(Resource):
+
+        @token_required
+        def post(self, user_id):
+            ...
+    ```
+
+    The token is __invalid__ if:
+
+    - Token secret key does not match app secret key
+    - Token issuer does not match client requesting the resource (route)
+    - Token audience does not match app domain
+    - Token has expired or was not found in redis data store
+    - Token user could not be found in the database
+    &#34;&#34;&#34;
     @wraps(f)
     def decorated(self, *args, **kwargs):
         token = None
@@ -73,6 +100,8 @@ def token_required(f):
 
 
 class Login(Resource):
+    &#34;&#34;&#34;
+    &#34;&#34;&#34;
 
     def __init__(self):
         self.parser = reqparse.RequestParser()
@@ -118,9 +147,21 @@ class Login(Resource):
 
 
 class Logout(Resource):
+    &#34;&#34;&#34;
+    Resouce responsible for executing the user logout.
+    &#34;&#34;&#34;
 
     @token_required
     def delete(self, user_id):
+        &#34;&#34;&#34;
+        This function removes the token of the authenticated user from Redis.
+
+        __Returns__:
+            
+        Http Status Code 204
+
+        &#34;&#34;&#34;
+
         # TODO: Blacklist the Token?
         app.redis.delete(f&#39;auth|{user_id}&#39;)
 
@@ -138,12 +179,50 @@ class Logout(Resource):
 <span>def <span class="ident">token_required</span></span>(<span>f)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This function defines a function decorator to be used in API routes where a a token is required.
+In case the token is not valid or token is not present in header, the decorated function won't be executed</p>
+<p><strong>Example</strong>:</p>
+<pre><code>class EventList(Resource):
+
+    @token_required
+    def post(self, user_id):
+        ...
+</code></pre>
+<p>The token is <strong>invalid</strong> if:</p>
+<ul>
+<li>Token secret key does not match app secret key</li>
+<li>Token issuer does not match client requesting the resource (route)</li>
+<li>Token audience does not match app domain</li>
+<li>Token has expired or was not found in redis data store</li>
+<li>Token user could not be found in the database</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def token_required(f):
+    &#34;&#34;&#34;
+    This function defines a function decorator to be used in API routes where a a token is required.
+    In case the token is not valid or token is not present in header, the decorated function won&#39;t be executed
+
+    __Example__:
+
+    ```
+    class EventList(Resource):
+
+        @token_required
+        def post(self, user_id):
+            ...
+    ```
+
+    The token is __invalid__ if:
+
+    - Token secret key does not match app secret key
+    - Token issuer does not match client requesting the resource (route)
+    - Token audience does not match app domain
+    - Token has expired or was not found in redis data store
+    - Token user could not be found in the database
+    &#34;&#34;&#34;
     @wraps(f)
     def decorated(self, *args, **kwargs):
         token = None
@@ -189,18 +268,14 @@ class Logout(Resource):
 <span>class <span class="ident">Login</span></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Represents an abstract RESTful resource. Concrete resources should
-extend from this class and expose methods for each supported HTTP
-method. If a resource is invoked with an unsupported HTTP method,
-the API will return a response with status 405 Method Not Allowed.
-Otherwise the appropriate method is called and passed all arguments
-from the url rule used when adding the resource to an Api instance. See
-:meth:<code>~flask_restful.Api.add_resource</code> for details.</p></section>
+<section class="desc"></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Login(Resource):
+    &#34;&#34;&#34;
+    &#34;&#34;&#34;
 
     def __init__(self):
         self.parser = reqparse.RequestParser()
@@ -312,21 +387,27 @@ from the url rule used when adding the resource to an Api instance. See
 <span>class <span class="ident">Logout</span></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Represents an abstract RESTful resource. Concrete resources should
-extend from this class and expose methods for each supported HTTP
-method. If a resource is invoked with an unsupported HTTP method,
-the API will return a response with status 405 Method Not Allowed.
-Otherwise the appropriate method is called and passed all arguments
-from the url rule used when adding the resource to an Api instance. See
-:meth:<code>~flask_restful.Api.add_resource</code> for details.</p></section>
+<section class="desc"><p>Resouce responsible for executing the user logout.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Logout(Resource):
+    &#34;&#34;&#34;
+    Resouce responsible for executing the user logout.
+    &#34;&#34;&#34;
 
     @token_required
     def delete(self, user_id):
+        &#34;&#34;&#34;
+        This function removes the token of the authenticated user from Redis.
+
+        __Returns__:
+            
+        Http Status Code 204
+
+        &#34;&#34;&#34;
+
         # TODO: Blacklist the Token?
         app.redis.delete(f&#39;auth|{user_id}&#39;)
 
@@ -351,13 +432,24 @@ from the url rule used when adding the resource to an Api instance. See
 <span>def <span class="ident">delete</span></span>(<span>self, user_id)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This function removes the token of the authenticated user from Redis.</p>
+<p><strong>Returns</strong>:</p>
+<p>Http Status Code 204</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@token_required
 def delete(self, user_id):
+    &#34;&#34;&#34;
+    This function removes the token of the authenticated user from Redis.
+
+    __Returns__:
+        
+    Http Status Code 204
+
+    &#34;&#34;&#34;
+
     # TODO: Blacklist the Token?
     app.redis.delete(f&#39;auth|{user_id}&#39;)
 

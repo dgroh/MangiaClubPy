@@ -81,6 +81,19 @@ This will start the API on http://localhost:5000
 
 To test the API you can use [Postman](https://www.postman.com/)
 
+## Documentation
+
+For generating the documentation based on the `docstrings` we use [pdoc](https://pdoc3.github.io/pdoc/doc/pdoc/) 
+
+
+If a `docstring` has been changed, run:
+
+```bash
+$ pdoc api --html -o docs --force
+```
+
+This will update the current [index.html](docs/index.html)
+
 ## Built With
 
 * [Python 3](https://docs.python.org/3/)

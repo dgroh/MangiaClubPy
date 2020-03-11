@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.5" />
 <title>api.resources API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Resources module where the API routes are registered." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,11 +20,16 @@
 <h1 class="title">Module <code>api.resources</code></h1>
 </header>
 <section id="section-intro">
+<p>Resources module where the API routes are registered.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from flask_restful import Api
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34; Resources module where the API routes are registered.
+&#34;&#34;&#34;
+
+from flask_restful import Api
 
 from api.resources.auth import Login, Logout
 from api.resources.event import EventList, Event
@@ -33,6 +38,9 @@ from api.resources.constants import Routes
 
 
 def init_resources(app):
+    &#34;&#34;&#34;This function initializes the resources with the corresponding routes.
+    &#34;&#34;&#34;
+
     api = Api(app)
 
     api.add_resource(EventList, Routes.EVENTS_V1)
@@ -48,7 +56,7 @@ def init_resources(app):
 <dl>
 <dt><code class="name"><a title="api.resources.auth" href="auth.html">api.resources.auth</a></code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>Auth module which is responsible for the user authentication and authorization</p></section>
 </dd>
 <dt><code class="name"><a title="api.resources.constants" href="constants.html">api.resources.constants</a></code></dt>
 <dd>
@@ -73,12 +81,15 @@ def init_resources(app):
 <span>def <span class="ident">init_resources</span></span>(<span>app)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This function initializes the resources with the corresponding routes.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def init_resources(app):
+    &#34;&#34;&#34;This function initializes the resources with the corresponding routes.
+    &#34;&#34;&#34;
+
     api = Api(app)
 
     api.add_resource(EventList, Routes.EVENTS_V1)

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.5" />
 <title>api API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="API module where app creation occurs." />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,17 +20,33 @@
 <h1 class="title">Module <code>api</code></h1>
 </header>
 <section id="section-intro">
+<p>API module where app creation occurs.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from flask import Flask
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34; API module where app creation occurs.
+&#34;&#34;&#34;
+
+from flask import Flask
 from api.resources import init_resources
 
 from config import ProductionConfig, TestingConfig, DevelopmentConfig
 
 
 def create_app():
+    &#34;&#34;&#34;This function initializes the app.
+    
+    The app will be as a [Flask](https://palletsprojects.com/p/flask/) app initialized.
+    
+    In addition all the api routes and databases will be initialized here.
+
+    The list of routes and the initialization method for them can be found here: `api.resources`
+
+    The database initialization methods can be found here: `api.db`
+    &#34;&#34;&#34;
+
     app = Flask(__name__)
 
     init_resources(app)
@@ -59,11 +75,11 @@ def create_app():
 <dl>
 <dt><code class="name"><a title="api.db" href="db/index.html">api.db</a></code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>DB module where database related instances occurs …</p></section>
 </dd>
 <dt><code class="name"><a title="api.resources" href="resources/index.html">api.resources</a></code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>Resources module where the API routes are registered.</p></section>
 </dd>
 </dl>
 </section>
@@ -76,12 +92,27 @@ def create_app():
 <span>def <span class="ident">create_app</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This function initializes the app.</p>
+<p>The app will be as a <a href="https://palletsprojects.com/p/flask/">Flask</a> app initialized.</p>
+<p>In addition all the api routes and databases will be initialized here.</p>
+<p>The list of routes and the initialization method for them can be found here: <a title="api.resources" href="resources/index.html"><code>api.resources</code></a></p>
+<p>The database initialization methods can be found here: <a title="api.db" href="db/index.html"><code>api.db</code></a></p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_app():
+    &#34;&#34;&#34;This function initializes the app.
+    
+    The app will be as a [Flask](https://palletsprojects.com/p/flask/) app initialized.
+    
+    In addition all the api routes and databases will be initialized here.
+
+    The list of routes and the initialization method for them can be found here: `api.resources`
+
+    The database initialization methods can be found here: `api.db`
+    &#34;&#34;&#34;
+
     app = Flask(__name__)
 
     init_resources(app)
