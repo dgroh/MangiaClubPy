@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.7.5" />
+<title>api.resources.auth API documentation</title>
+<meta name="description" content="Auth module which is responsible for the user authentication and authorization" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>api.resources.auth</code></h1>
+</header>
+<section id="section-intro">
+<p>Auth module which is responsible for the user authentication and authorization</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34; Auth module which is responsible for the user authentication and authorization
+&#34;&#34;&#34;
+
+from flask import make_response, request, current_app as app
+from flask_restful import Resource, reqparse
+from datetime import datetime, timedelta
+from functools import wraps
+from bson import ObjectId
+import jwt
+import bcrypt
+
+from api.resources.constants import HttpStatusCode
+
+
+def token_required(f):
+    &#34;&#34;&#34;
+    This function defines a function decorator to be used in API routes where a a token is required.
+    In case the token is not valid or token is not present in header, the decorated function won&#39;t be executed
+
+    __Example__:
+
+    ```
+    class EventList(Resource):
+
+        @token_required
+        def post(self, user_id):
+            ...
+    ```
+
+    The token is __invalid__ if:
+
+    - Token secret key does not match app secret key
+    - Token issuer does not match client requesting the resource (route)
+    - Token audience does not match app domain
+    - Token has expired or was not found in redis data store
+    - Token user could not be found in the database
+    &#34;&#34;&#34;
+    @wraps(f)
+    def decorated(self, *args, **kwargs):
+        token = None
+
+        if &#39;Access-Token&#39; in request.headers:
+            token = request.headers[&#39;Access-Token&#39;]
+        else:
+            return make_response(&#39;[HTTP_403_FORBIDDEN]&#39;, HttpStatusCode.HTTP_403_FORBIDDEN)
+
+        try:
+            data = jwt.decode(token, app.config[&#39;SECRET_KEY&#39;], algorithms=[&#39;HS256&#39;])
+
+            claim_sub = data[&#39;sub&#39;]
+            claim_email = data[&#39;email&#39;]
+
+            token_alive = app.redis.get(claim_sub)
+
+            if not token_alive:
+                return make_response(&#39;[INVALID_TOKEN]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
+
+            user_id = claim_sub.replace(&#39;auth|&#39;, &#39;&#39;)
+
+            user = app.mongo.db.users.find_one({&#39;_id&#39;: ObjectId(user_id), &#39;email&#39;: claim_email})
+
+            if not user:
+                return make_response(&#39;[INVALID_TOKEN]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            # TODO: Log the exception
+            return make_response(&#39;[INVALID_TOKEN]&#39;, HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return f(self, user_id, *args, **kwargs)
+
+    return decorated
+
+
+class Login(Resource):
+    &#34;&#34;&#34;
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument(&#39;email&#39;, required=True)
+        self.parser.add_argument(&#39;password&#39;, required=True)
+
+    def post(self):
+        args = self.parser.parse_args()
+        email = args[&#39;email&#39;]
+        password = args[&#39;password&#39;]
+
+        users = app.mongo.db.users
+
+        user = users.find_one({&#39;email&#39;: email})
+
+        if not user:
+            return make_response(&#39;[HTTP_404_NOT_FOUND]&#39;, HttpStatusCode.HTTP_404_NOT_FOUND)
+
+        if bcrypt.checkpw(password.encode(&#39;utf-8&#39;), user[&#39;hashed_password&#39;]):
+            try:
+                expires_in = timedelta(days=60)
+
+                user_id = str(user[&#39;_id&#39;])
+
+                payload = {
+                    &#39;exp&#39;: datetime.utcnow() + expires_in,
+                    &#39;iat&#39;: datetime.utcnow(),
+                    &#39;sub&#39;: f&#39;auth|{user_id}&#39;,
+                    &#39;email&#39;: email,
+                    &#39;phone:&#39;: user[&#39;phone&#39;]
+                }
+
+                token = jwt.encode(payload, app.config[&#39;SECRET_KEY&#39;], algorithm=&#39;HS256&#39;).decode(&#39;utf-8&#39;)
+
+                app.redis.setex(payload[&#39;sub&#39;], int(expires_in.total_seconds()), token)
+
+                return make_response({&#39;token&#39;: token}, HttpStatusCode.HTTP_201_CREATED)
+            except Exception as e:
+                # TODO: Log the exception
+                return make_response(&#39;[HTTP_500_INTERNAL_SERVER_ERROR]&#39;, HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return make_response(&#39;[HTTP_401_UNAUTHORIZED]&#39;, HttpStatusCode.HTTP_401_UNAUTHORIZED)
+
+
+class Logout(Resource):
+    &#34;&#34;&#34;
+    Resouce responsible for executing the user logout.
+    &#34;&#34;&#34;
+
+    @token_required
+    def delete(self, user_id):
+        &#34;&#34;&#34;
+        This function removes the token of the authenticated user from Redis.
+
+        __Returns__:
+            
+        Http Status Code 204
+
+        &#34;&#34;&#34;
+
+        # TODO: Blacklist the Token?
+        app.redis.delete(f&#39;auth|{user_id}&#39;)
+
+        return &#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="api.resources.auth.token_required"><code class="name flex">
+<span>def <span class="ident">token_required</span></span>(<span>f)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>This function defines a function decorator to be used in API routes where a a token is required.
+In case the token is not valid or token is not present in header, the decorated function won't be executed</p>
+<p><strong>Example</strong>:</p>
+<pre><code>class EventList(Resource):
+
+    @token_required
+    def post(self, user_id):
+        ...
+</code></pre>
+<p>The token is <strong>invalid</strong> if:</p>
+<ul>
+<li>Token secret key does not match app secret key</li>
+<li>Token issuer does not match client requesting the resource (route)</li>
+<li>Token audience does not match app domain</li>
+<li>Token has expired or was not found in redis data store</li>
+<li>Token user could not be found in the database</li>
+</ul></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def token_required(f):
+    &#34;&#34;&#34;
+    This function defines a function decorator to be used in API routes where a a token is required.
+    In case the token is not valid or token is not present in header, the decorated function won&#39;t be executed
+
+    __Example__:
+
+    ```
+    class EventList(Resource):
+
+        @token_required
+        def post(self, user_id):
+            ...
+    ```
+
+    The token is __invalid__ if:
+
+    - Token secret key does not match app secret key
+    - Token issuer does not match client requesting the resource (route)
+    - Token audience does not match app domain
+    - Token has expired or was not found in redis data store
+    - Token user could not be found in the database
+    &#34;&#34;&#34;
+    @wraps(f)
+    def decorated(self, *args, **kwargs):
+        token = None
+
+        if &#39;Access-Token&#39; in request.headers:
+            token = request.headers[&#39;Access-Token&#39;]
+        else:
+            return make_response(&#39;[HTTP_403_FORBIDDEN]&#39;, HttpStatusCode.HTTP_403_FORBIDDEN)
+
+        try:
+            data = jwt.decode(token, app.config[&#39;SECRET_KEY&#39;], algorithms=[&#39;HS256&#39;])
+
+            claim_sub = data[&#39;sub&#39;]
+            claim_email = data[&#39;email&#39;]
+
+            token_alive = app.redis.get(claim_sub)
+
+            if not token_alive:
+                return make_response(&#39;[INVALID_TOKEN]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
+
+            user_id = claim_sub.replace(&#39;auth|&#39;, &#39;&#39;)
+
+            user = app.mongo.db.users.find_one({&#39;_id&#39;: ObjectId(user_id), &#39;email&#39;: claim_email})
+
+            if not user:
+                return make_response(&#39;[INVALID_TOKEN]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            # TODO: Log the exception
+            return make_response(&#39;[INVALID_TOKEN]&#39;, HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return f(self, user_id, *args, **kwargs)
+
+    return decorated</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="api.resources.auth.Login"><code class="flex name class">
+<span>class <span class="ident">Login</span></span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Login(Resource):
+    &#34;&#34;&#34;
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument(&#39;email&#39;, required=True)
+        self.parser.add_argument(&#39;password&#39;, required=True)
+
+    def post(self):
+        args = self.parser.parse_args()
+        email = args[&#39;email&#39;]
+        password = args[&#39;password&#39;]
+
+        users = app.mongo.db.users
+
+        user = users.find_one({&#39;email&#39;: email})
+
+        if not user:
+            return make_response(&#39;[HTTP_404_NOT_FOUND]&#39;, HttpStatusCode.HTTP_404_NOT_FOUND)
+
+        if bcrypt.checkpw(password.encode(&#39;utf-8&#39;), user[&#39;hashed_password&#39;]):
+            try:
+                expires_in = timedelta(days=60)
+
+                user_id = str(user[&#39;_id&#39;])
+
+                payload = {
+                    &#39;exp&#39;: datetime.utcnow() + expires_in,
+                    &#39;iat&#39;: datetime.utcnow(),
+                    &#39;sub&#39;: f&#39;auth|{user_id}&#39;,
+                    &#39;email&#39;: email,
+                    &#39;phone:&#39;: user[&#39;phone&#39;]
+                }
+
+                token = jwt.encode(payload, app.config[&#39;SECRET_KEY&#39;], algorithm=&#39;HS256&#39;).decode(&#39;utf-8&#39;)
+
+                app.redis.setex(payload[&#39;sub&#39;], int(expires_in.total_seconds()), token)
+
+                return make_response({&#39;token&#39;: token}, HttpStatusCode.HTTP_201_CREATED)
+            except Exception as e:
+                # TODO: Log the exception
+                return make_response(&#39;[HTTP_500_INTERNAL_SERVER_ERROR]&#39;, HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return make_response(&#39;[HTTP_401_UNAUTHORIZED]&#39;, HttpStatusCode.HTTP_401_UNAUTHORIZED)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>flask_restful.Resource</li>
+<li>flask.views.MethodView</li>
+<li>flask.views.View</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="api.resources.auth.Login.methods"><code class="name">var <span class="ident">methods</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="api.resources.auth.Login.post"><code class="name flex">
+<span>def <span class="ident">post</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def post(self):
+    args = self.parser.parse_args()
+    email = args[&#39;email&#39;]
+    password = args[&#39;password&#39;]
+
+    users = app.mongo.db.users
+
+    user = users.find_one({&#39;email&#39;: email})
+
+    if not user:
+        return make_response(&#39;[HTTP_404_NOT_FOUND]&#39;, HttpStatusCode.HTTP_404_NOT_FOUND)
+
+    if bcrypt.checkpw(password.encode(&#39;utf-8&#39;), user[&#39;hashed_password&#39;]):
+        try:
+            expires_in = timedelta(days=60)
+
+            user_id = str(user[&#39;_id&#39;])
+
+            payload = {
+                &#39;exp&#39;: datetime.utcnow() + expires_in,
+                &#39;iat&#39;: datetime.utcnow(),
+                &#39;sub&#39;: f&#39;auth|{user_id}&#39;,
+                &#39;email&#39;: email,
+                &#39;phone:&#39;: user[&#39;phone&#39;]
+            }
+
+            token = jwt.encode(payload, app.config[&#39;SECRET_KEY&#39;], algorithm=&#39;HS256&#39;).decode(&#39;utf-8&#39;)
+
+            app.redis.setex(payload[&#39;sub&#39;], int(expires_in.total_seconds()), token)
+
+            return make_response({&#39;token&#39;: token}, HttpStatusCode.HTTP_201_CREATED)
+        except Exception as e:
+            # TODO: Log the exception
+            return make_response(&#39;[HTTP_500_INTERNAL_SERVER_ERROR]&#39;, HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return make_response(&#39;[HTTP_401_UNAUTHORIZED]&#39;, HttpStatusCode.HTTP_401_UNAUTHORIZED)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="api.resources.auth.Logout"><code class="flex name class">
+<span>class <span class="ident">Logout</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Resouce responsible for executing the user logout.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Logout(Resource):
+    &#34;&#34;&#34;
+    Resouce responsible for executing the user logout.
+    &#34;&#34;&#34;
+
+    @token_required
+    def delete(self, user_id):
+        &#34;&#34;&#34;
+        This function removes the token of the authenticated user from Redis.
+
+        __Returns__:
+            
+        Http Status Code 204
+
+        &#34;&#34;&#34;
+
+        # TODO: Blacklist the Token?
+        app.redis.delete(f&#39;auth|{user_id}&#39;)
+
+        return &#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>flask_restful.Resource</li>
+<li>flask.views.MethodView</li>
+<li>flask.views.View</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="api.resources.auth.Logout.methods"><code class="name">var <span class="ident">methods</span></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="api.resources.auth.Logout.delete"><code class="name flex">
+<span>def <span class="ident">delete</span></span>(<span>self, user_id)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>This function removes the token of the authenticated user from Redis.</p>
+<p><strong>Returns</strong>:</p>
+<p>Http Status Code 204</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@token_required
+def delete(self, user_id):
+    &#34;&#34;&#34;
+    This function removes the token of the authenticated user from Redis.
+
+    __Returns__:
+        
+    Http Status Code 204
+
+    &#34;&#34;&#34;
+
+    # TODO: Blacklist the Token?
+    app.redis.delete(f&#39;auth|{user_id}&#39;)
+
+    return &#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="api.resources" href="index.html">api.resources</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="api.resources.auth.token_required" href="#api.resources.auth.token_required">token_required</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="api.resources.auth.Login" href="#api.resources.auth.Login">Login</a></code></h4>
+<ul class="">
+<li><code><a title="api.resources.auth.Login.methods" href="#api.resources.auth.Login.methods">methods</a></code></li>
+<li><code><a title="api.resources.auth.Login.post" href="#api.resources.auth.Login.post">post</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="api.resources.auth.Logout" href="#api.resources.auth.Logout">Logout</a></code></h4>
+<ul class="">
+<li><code><a title="api.resources.auth.Logout.delete" href="#api.resources.auth.Logout.delete">delete</a></code></li>
+<li><code><a title="api.resources.auth.Logout.methods" href="#api.resources.auth.Logout.methods">methods</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.7.5</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

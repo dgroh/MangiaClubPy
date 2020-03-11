@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+""" Resources module where the API routes are registered.
+"""
+
 from flask_restful import Api
 
 from api.resources.auth import Login, Logout
@@ -7,6 +11,9 @@ from api.resources.constants import Routes
 
 
 def init_resources(app):
+    """This function initializes the resources with the corresponding routes.
+    """
+
     api = Api(app)
 
     api.add_resource(EventList, Routes.EVENTS_V1)

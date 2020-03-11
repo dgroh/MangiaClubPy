@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 def create_event(app, user_id):
     """
-    Create a test event in mongomock to be used throughout the tests
+    This function creates a test event in mongomock to be used throughout the tests
     """
 
     event = {
@@ -31,7 +31,7 @@ def create_event(app, user_id):
 
 def create_user(app):
     """
-    Create a test user in mongomock to be used throughout the tests
+    This function creates a test user in mongomock to be used throughout the tests
     """
     password_salt = bcrypt.gensalt()
 
@@ -53,7 +53,7 @@ def create_user(app):
 
 def create_token(user, expiration: int, secret: str):
     """
-    Creates a jwt token for the test user
+    This function creates a jwt token for the test user
 
     :param user: The user to be encoded (`_id`, `email` and `phone` are required attributes). 
     :param expiration: The expiration in days
