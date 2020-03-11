@@ -81,7 +81,7 @@ class TestLoginMethods(unittest.TestCase, CustomAssertions):
                 'utf-8')
 
             # Act
-            response = client.post(Routes.LOGIN_V1, json={'email': 'foo@foo.com', 'password': 'foo'})
+            response = client.post(Routes.LOGIN_V1, json={'email': 'foo@foo.com ', 'password': '  foo  '})
 
             # Assert
             self.app.redis.setex.assert_called_with(expected_payload['sub'], int(expires_in.total_seconds()),

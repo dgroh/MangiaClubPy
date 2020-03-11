@@ -83,8 +83,8 @@ class Login(Resource):
 
     def post(self):
         args = self.parser.parse_args()
-        email = args['email']
-        password = args['password']
+        email = args['email'].strip()
+        password = args['password'].strip()
 
         users = app.mongo.db.users
 

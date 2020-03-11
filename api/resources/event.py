@@ -21,6 +21,8 @@ class Event(Resource):
     def __init__(self):
         self.parser = base_parser.copy()
 
+        # TODO: Use list comprehension with new symbol in Python 3.8: 
+        # https://stackoverflow.com/questions/10291997/how-can-i-do-assignments-in-a-list-comprehension
         for arg in self.parser.args:
             arg.required = False
 

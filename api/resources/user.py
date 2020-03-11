@@ -99,7 +99,9 @@ class UserList(Resource):
     def post(self):
         args = self.parser.parse_args()
 
-        existing_user = app.mongo.db.users.find_one({'email': args['email']})
+        email = args['email'].strip()
+
+        existing_user = app.mongo.db.users.find_one({'email': email})
 
         if existing_user is None:
             password_salt = bcrypt.gensalt()
@@ -107,12 +109,12 @@ class UserList(Resource):
             hashed_password = bcrypt.hashpw(args['password'].encode('utf-8'), password_salt)
 
             inserted_id = app.mongo.db.users.insert_one({
-                'email': args['email'],
-                'first_name': args['first_name'],
-                'last_name': args['last_name'],
+                'email': email,
+                'first_name': args['first_name'].strip(),
+                'last_name': args['last_name'].strip(),
                 'hashed_password': hashed_password,
                 'password_salt': password_salt,
-                'phone': args['phone'],
+                'phone': args['phone'].strip(),
                 'published:': True,
                 'created_datetime': datetime.utcnow()
             }).inserted_id
