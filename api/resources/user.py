@@ -106,7 +106,7 @@ class UserList(Resource):
         if existing_user is None:
             password_salt = bcrypt.gensalt()
 
-            hashed_password = bcrypt.hashpw(args['password'].encode('utf-8'), password_salt)
+            hashed_password = bcrypt.hashpw(args['password'].strip().encode('utf-8'), password_salt)
 
             inserted_id = app.mongo.db.users.insert_one({
                 'email': email,
