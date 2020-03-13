@@ -35,6 +35,10 @@ def token_required(f):
     - Token audience does not match app domain
     - Token has expired or was not found in redis data store
     - Token user could not be found in the database
+
+    __Returns:__
+
+    The user id to the decorated function
     """
     @wraps(f)
     def decorated(self, *args, **kwargs):
@@ -74,6 +78,7 @@ def token_required(f):
 
 class Login(Resource):
     """
+    This class represents the resouce responsible for executing the user login.
     """
 
     def __init__(self):
@@ -82,6 +87,17 @@ class Login(Resource):
         self.parser.add_argument('password', required=True)
 
     def post(self):
+        """
+        This method executes the login based on email and password passed in the arguments.
+        
+        __Returns:__
+
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If password does not match: A json response with the text [HTTP_401_UNAUTHORIZED]
+        * If internal server error: A json response with text [HTTP_500_INTERNAL_SERVER_ERROR]
+        * If success: A json response with an access token
+        """
+
         args = self.parser.parse_args()
         email = args['email'].strip()
         password = args['password'].strip()
@@ -121,21 +137,21 @@ class Login(Resource):
 
 class Logout(Resource):
     """
-    Resouce responsible for executing the user logout.
+    This class represents the resouce responsible for executing the user logout.
     """
 
     @token_required
     def delete(self, user_id):
         """
-        This function removes the token of the authenticated user from Redis.
+        This method removes the token of the authenticated user from Redis.
 
         __Returns__:
             
-        Http Status Code 204
+        This method does not return content as per default for HTTP Status Code 204
 
         """
 
         # TODO: Blacklist the Token?
         app.redis.delete(f'auth|{user_id}')
 
-        return '[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT
+        return make_response('[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT)

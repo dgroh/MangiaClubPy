@@ -62,6 +62,10 @@ def token_required(f):
     - Token audience does not match app domain
     - Token has expired or was not found in redis data store
     - Token user could not be found in the database
+
+    __Returns:__
+
+    The user id to the decorated function
     &#34;&#34;&#34;
     @wraps(f)
     def decorated(self, *args, **kwargs):
@@ -101,6 +105,7 @@ def token_required(f):
 
 class Login(Resource):
     &#34;&#34;&#34;
+    This class represents the resouce responsible for executing the user login.
     &#34;&#34;&#34;
 
     def __init__(self):
@@ -109,9 +114,20 @@ class Login(Resource):
         self.parser.add_argument(&#39;password&#39;, required=True)
 
     def post(self):
+        &#34;&#34;&#34;
+        This method executes the login based on email and password passed in the arguments.
+        
+        __Returns:__
+
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If password does not match: A json response with the text [HTTP_401_UNAUTHORIZED]
+        * If internal server error: A json response with text [HTTP_500_INTERNAL_SERVER_ERROR]
+        * If success: A json response with an access token
+        &#34;&#34;&#34;
+
         args = self.parser.parse_args()
-        email = args[&#39;email&#39;]
-        password = args[&#39;password&#39;]
+        email = args[&#39;email&#39;].strip()
+        password = args[&#39;password&#39;].strip()
 
         users = app.mongo.db.users
 
@@ -148,24 +164,24 @@ class Login(Resource):
 
 class Logout(Resource):
     &#34;&#34;&#34;
-    Resouce responsible for executing the user logout.
+    This class represents the resouce responsible for executing the user logout.
     &#34;&#34;&#34;
 
     @token_required
     def delete(self, user_id):
         &#34;&#34;&#34;
-        This function removes the token of the authenticated user from Redis.
+        This method removes the token of the authenticated user from Redis.
 
         __Returns__:
             
-        Http Status Code 204
+        This method does not return content as per default for HTTP Status Code 204
 
         &#34;&#34;&#34;
 
         # TODO: Blacklist the Token?
         app.redis.delete(f&#39;auth|{user_id}&#39;)
 
-        return &#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT</code></pre>
+        return make_response(&#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT)</code></pre>
 </details>
 </section>
 <section>
@@ -195,7 +211,9 @@ In case the token is not valid or token is not present in header, the decorated 
 <li>Token audience does not match app domain</li>
 <li>Token has expired or was not found in redis data store</li>
 <li>Token user could not be found in the database</li>
-</ul></section>
+</ul>
+<p><strong>Returns:</strong></p>
+<p>The user id to the decorated function</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -222,6 +240,10 @@ In case the token is not valid or token is not present in header, the decorated 
     - Token audience does not match app domain
     - Token has expired or was not found in redis data store
     - Token user could not be found in the database
+
+    __Returns:__
+
+    The user id to the decorated function
     &#34;&#34;&#34;
     @wraps(f)
     def decorated(self, *args, **kwargs):
@@ -268,13 +290,14 @@ In case the token is not valid or token is not present in header, the decorated 
 <span>class <span class="ident">Login</span></span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This class represents the resouce responsible for executing the user login.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Login(Resource):
     &#34;&#34;&#34;
+    This class represents the resouce responsible for executing the user login.
     &#34;&#34;&#34;
 
     def __init__(self):
@@ -283,9 +306,20 @@ In case the token is not valid or token is not present in header, the decorated 
         self.parser.add_argument(&#39;password&#39;, required=True)
 
     def post(self):
+        &#34;&#34;&#34;
+        This method executes the login based on email and password passed in the arguments.
+        
+        __Returns:__
+
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If password does not match: A json response with the text [HTTP_401_UNAUTHORIZED]
+        * If internal server error: A json response with text [HTTP_500_INTERNAL_SERVER_ERROR]
+        * If success: A json response with an access token
+        &#34;&#34;&#34;
+
         args = self.parser.parse_args()
-        email = args[&#39;email&#39;]
-        password = args[&#39;password&#39;]
+        email = args[&#39;email&#39;].strip()
+        password = args[&#39;password&#39;].strip()
 
         users = app.mongo.db.users
 
@@ -338,15 +372,33 @@ In case the token is not valid or token is not present in header, the decorated 
 <span>def <span class="ident">post</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This method executes the login based on email and password passed in the arguments.</p>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>If user not found: A json response with the text [HTTP_404_NOT_FOUND]</li>
+<li>If password does not match: A json response with the text [HTTP_401_UNAUTHORIZED]</li>
+<li>If internal server error: A json response with text [HTTP_500_INTERNAL_SERVER_ERROR]</li>
+<li>If success: A json response with an access token</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def post(self):
+    &#34;&#34;&#34;
+    This method executes the login based on email and password passed in the arguments.
+    
+    __Returns:__
+
+    * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+    * If password does not match: A json response with the text [HTTP_401_UNAUTHORIZED]
+    * If internal server error: A json response with text [HTTP_500_INTERNAL_SERVER_ERROR]
+    * If success: A json response with an access token
+    &#34;&#34;&#34;
+
     args = self.parser.parse_args()
-    email = args[&#39;email&#39;]
-    password = args[&#39;password&#39;]
+    email = args[&#39;email&#39;].strip()
+    password = args[&#39;password&#39;].strip()
 
     users = app.mongo.db.users
 
@@ -387,31 +439,31 @@ In case the token is not valid or token is not present in header, the decorated 
 <span>class <span class="ident">Logout</span></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Resouce responsible for executing the user logout.</p></section>
+<section class="desc"><p>This class represents the resouce responsible for executing the user logout.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Logout(Resource):
     &#34;&#34;&#34;
-    Resouce responsible for executing the user logout.
+    This class represents the resouce responsible for executing the user logout.
     &#34;&#34;&#34;
 
     @token_required
     def delete(self, user_id):
         &#34;&#34;&#34;
-        This function removes the token of the authenticated user from Redis.
+        This method removes the token of the authenticated user from Redis.
 
         __Returns__:
             
-        Http Status Code 204
+        This method does not return content as per default for HTTP Status Code 204
 
         &#34;&#34;&#34;
 
         # TODO: Blacklist the Token?
         app.redis.delete(f&#39;auth|{user_id}&#39;)
 
-        return &#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT</code></pre>
+        return make_response(&#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -432,9 +484,9 @@ In case the token is not valid or token is not present in header, the decorated 
 <span>def <span class="ident">delete</span></span>(<span>self, user_id)</span>
 </code></dt>
 <dd>
-<section class="desc"><p>This function removes the token of the authenticated user from Redis.</p>
+<section class="desc"><p>This method removes the token of the authenticated user from Redis.</p>
 <p><strong>Returns</strong>:</p>
-<p>Http Status Code 204</p></section>
+<p>This method does not return content as per default for HTTP Status Code 204</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -442,18 +494,18 @@ In case the token is not valid or token is not present in header, the decorated 
 <pre><code class="python">@token_required
 def delete(self, user_id):
     &#34;&#34;&#34;
-    This function removes the token of the authenticated user from Redis.
+    This method removes the token of the authenticated user from Redis.
 
     __Returns__:
         
-    Http Status Code 204
+    This method does not return content as per default for HTTP Status Code 204
 
     &#34;&#34;&#34;
 
     # TODO: Blacklist the Token?
     app.redis.delete(f&#39;auth|{user_id}&#39;)
 
-    return &#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT</code></pre>
+    return make_response(&#39;[HTTP_204_NO_CONTENT]&#39;, HttpStatusCode.HTTP_204_NO_CONTENT)</code></pre>
 </details>
 </dd>
 </dl>

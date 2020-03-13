@@ -25,46 +25,28 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class HttpStatusCode:
+    &#34;&#34;&#34;
+    This class defines all constants for HTTP Status Codes to be used throughout the API.
+    &#34;&#34;&#34;
+
     HTTP_200_OK = 200
     HTTP_201_CREATED = 201
-    HTTP_202_ACCEPTED = 202
-    HTTP_203_NON_AUTHORITATIVE_INFORMATION = 203
     HTTP_204_NO_CONTENT = 204
-    HTTP_205_RESET_CONTENT = 205
-    HTTP_206_PARTIAL_CONTENT = 206
 
     HTTP_400_BAD_REQUEST = 400
     HTTP_401_UNAUTHORIZED = 401
-    HTTP_402_PAYMENT_REQUIRED = 402
     HTTP_403_FORBIDDEN = 403
     HTTP_404_NOT_FOUND = 404
-    HTTP_405_METHOD_NOT_ALLOWED = 405
-    HTTP_406_NOT_ACCEPTABLE = 406
-    HTTP_407_PROXY_AUTHENTICATION_REQUIRED = 407
-    HTTP_408_REQUEST_TIMEOUT = 408
     HTTP_409_CONFLICT = 409
-    HTTP_410_GONE = 410
-    HTTP_411_LENGTH_REQUIRED = 411
-    HTTP_412_PRECONDITION_FAILED = 412
-    HTTP_413_REQUEST_ENTITY_TOO_LARGE = 413
-    HTTP_414_REQUEST_URI_TOO_LONG = 414
-    HTTP_415_UNSUPPORTED_MEDIA_TYPE = 415
-    HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE = 416
-    HTTP_417_EXPECTATION_FAILED = 417
-    HTTP_428_PRECONDITION_REQUIRED = 428
-    HTTP_429_TOO_MANY_REQUESTS = 429
-    HTTP_431_REQUEST_HEADER_FIELDS_TOO_LARGE = 431
 
     HTTP_500_INTERNAL_SERVER_ERROR = 500
-    HTTP_501_NOT_IMPLEMENTED = 501
-    HTTP_502_BAD_GATEWAY = 502
-    HTTP_503_SERVICE_UNAVAILABLE = 503
-    HTTP_504_GATEWAY_TIMEOUT = 504
-    HTTP_505_HTTP_VERSION_NOT_SUPPORTED = 505
-    HTTP_511_NETWORK_AUTHENTICATION_REQUIRED = 511
 
 
 class Routes:
+    &#34;&#34;&#34;
+    This class defines all constants for the routes of the API Resources.
+    &#34;&#34;&#34;
+
     EVENTS_V1 = &#39;/api/v1/events&#39;
     USERS_V1 = &#39;/api/v1/users&#39;
     LOGIN_V1 = &#39;/api/v1/auth/login&#39;
@@ -84,49 +66,27 @@ class Routes:
 <span>class <span class="ident">HttpStatusCode</span></span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This class defines all constants for HTTP Status Codes to be used throughout the API.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class HttpStatusCode:
+    &#34;&#34;&#34;
+    This class defines all constants for HTTP Status Codes to be used throughout the API.
+    &#34;&#34;&#34;
+
     HTTP_200_OK = 200
     HTTP_201_CREATED = 201
-    HTTP_202_ACCEPTED = 202
-    HTTP_203_NON_AUTHORITATIVE_INFORMATION = 203
     HTTP_204_NO_CONTENT = 204
-    HTTP_205_RESET_CONTENT = 205
-    HTTP_206_PARTIAL_CONTENT = 206
 
     HTTP_400_BAD_REQUEST = 400
     HTTP_401_UNAUTHORIZED = 401
-    HTTP_402_PAYMENT_REQUIRED = 402
     HTTP_403_FORBIDDEN = 403
     HTTP_404_NOT_FOUND = 404
-    HTTP_405_METHOD_NOT_ALLOWED = 405
-    HTTP_406_NOT_ACCEPTABLE = 406
-    HTTP_407_PROXY_AUTHENTICATION_REQUIRED = 407
-    HTTP_408_REQUEST_TIMEOUT = 408
     HTTP_409_CONFLICT = 409
-    HTTP_410_GONE = 410
-    HTTP_411_LENGTH_REQUIRED = 411
-    HTTP_412_PRECONDITION_FAILED = 412
-    HTTP_413_REQUEST_ENTITY_TOO_LARGE = 413
-    HTTP_414_REQUEST_URI_TOO_LONG = 414
-    HTTP_415_UNSUPPORTED_MEDIA_TYPE = 415
-    HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE = 416
-    HTTP_417_EXPECTATION_FAILED = 417
-    HTTP_428_PRECONDITION_REQUIRED = 428
-    HTTP_429_TOO_MANY_REQUESTS = 429
-    HTTP_431_REQUEST_HEADER_FIELDS_TOO_LARGE = 431
 
-    HTTP_500_INTERNAL_SERVER_ERROR = 500
-    HTTP_501_NOT_IMPLEMENTED = 501
-    HTTP_502_BAD_GATEWAY = 502
-    HTTP_503_SERVICE_UNAVAILABLE = 503
-    HTTP_504_GATEWAY_TIMEOUT = 504
-    HTTP_505_HTTP_VERSION_NOT_SUPPORTED = 505
-    HTTP_511_NETWORK_AUTHENTICATION_REQUIRED = 511</code></pre>
+    HTTP_500_INTERNAL_SERVER_ERROR = 500</code></pre>
 </details>
 <h3>Class variables</h3>
 <dl>
@@ -138,23 +98,7 @@ class Routes:
 <dd>
 <section class="desc"></section>
 </dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_202_ACCEPTED"><code class="name">var <span class="ident">HTTP_202_ACCEPTED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_203_NON_AUTHORITATIVE_INFORMATION"><code class="name">var <span class="ident">HTTP_203_NON_AUTHORITATIVE_INFORMATION</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
 <dt id="api.resources.constants.HttpStatusCode.HTTP_204_NO_CONTENT"><code class="name">var <span class="ident">HTTP_204_NO_CONTENT</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_205_RESET_CONTENT"><code class="name">var <span class="ident">HTTP_205_RESET_CONTENT</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_206_PARTIAL_CONTENT"><code class="name">var <span class="ident">HTTP_206_PARTIAL_CONTENT</span></code></dt>
 <dd>
 <section class="desc"></section>
 </dd>
@@ -166,10 +110,6 @@ class Routes:
 <dd>
 <section class="desc"></section>
 </dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_402_PAYMENT_REQUIRED"><code class="name">var <span class="ident">HTTP_402_PAYMENT_REQUIRED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
 <dt id="api.resources.constants.HttpStatusCode.HTTP_403_FORBIDDEN"><code class="name">var <span class="ident">HTTP_403_FORBIDDEN</span></code></dt>
 <dd>
 <section class="desc"></section>
@@ -178,95 +118,11 @@ class Routes:
 <dd>
 <section class="desc"></section>
 </dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_405_METHOD_NOT_ALLOWED"><code class="name">var <span class="ident">HTTP_405_METHOD_NOT_ALLOWED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_406_NOT_ACCEPTABLE"><code class="name">var <span class="ident">HTTP_406_NOT_ACCEPTABLE</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_407_PROXY_AUTHENTICATION_REQUIRED"><code class="name">var <span class="ident">HTTP_407_PROXY_AUTHENTICATION_REQUIRED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_408_REQUEST_TIMEOUT"><code class="name">var <span class="ident">HTTP_408_REQUEST_TIMEOUT</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
 <dt id="api.resources.constants.HttpStatusCode.HTTP_409_CONFLICT"><code class="name">var <span class="ident">HTTP_409_CONFLICT</span></code></dt>
 <dd>
 <section class="desc"></section>
 </dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_410_GONE"><code class="name">var <span class="ident">HTTP_410_GONE</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_411_LENGTH_REQUIRED"><code class="name">var <span class="ident">HTTP_411_LENGTH_REQUIRED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_412_PRECONDITION_FAILED"><code class="name">var <span class="ident">HTTP_412_PRECONDITION_FAILED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_413_REQUEST_ENTITY_TOO_LARGE"><code class="name">var <span class="ident">HTTP_413_REQUEST_ENTITY_TOO_LARGE</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_414_REQUEST_URI_TOO_LONG"><code class="name">var <span class="ident">HTTP_414_REQUEST_URI_TOO_LONG</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_415_UNSUPPORTED_MEDIA_TYPE"><code class="name">var <span class="ident">HTTP_415_UNSUPPORTED_MEDIA_TYPE</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE"><code class="name">var <span class="ident">HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_417_EXPECTATION_FAILED"><code class="name">var <span class="ident">HTTP_417_EXPECTATION_FAILED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_428_PRECONDITION_REQUIRED"><code class="name">var <span class="ident">HTTP_428_PRECONDITION_REQUIRED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_429_TOO_MANY_REQUESTS"><code class="name">var <span class="ident">HTTP_429_TOO_MANY_REQUESTS</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_431_REQUEST_HEADER_FIELDS_TOO_LARGE"><code class="name">var <span class="ident">HTTP_431_REQUEST_HEADER_FIELDS_TOO_LARGE</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
 <dt id="api.resources.constants.HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR"><code class="name">var <span class="ident">HTTP_500_INTERNAL_SERVER_ERROR</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_501_NOT_IMPLEMENTED"><code class="name">var <span class="ident">HTTP_501_NOT_IMPLEMENTED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_502_BAD_GATEWAY"><code class="name">var <span class="ident">HTTP_502_BAD_GATEWAY</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_503_SERVICE_UNAVAILABLE"><code class="name">var <span class="ident">HTTP_503_SERVICE_UNAVAILABLE</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_504_GATEWAY_TIMEOUT"><code class="name">var <span class="ident">HTTP_504_GATEWAY_TIMEOUT</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_505_HTTP_VERSION_NOT_SUPPORTED"><code class="name">var <span class="ident">HTTP_505_HTTP_VERSION_NOT_SUPPORTED</span></code></dt>
-<dd>
-<section class="desc"></section>
-</dd>
-<dt id="api.resources.constants.HttpStatusCode.HTTP_511_NETWORK_AUTHENTICATION_REQUIRED"><code class="name">var <span class="ident">HTTP_511_NETWORK_AUTHENTICATION_REQUIRED</span></code></dt>
 <dd>
 <section class="desc"></section>
 </dd>
@@ -276,12 +132,16 @@ class Routes:
 <span>class <span class="ident">Routes</span></span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This class defines all constants for the routes of the API Resources.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Routes:
+    &#34;&#34;&#34;
+    This class defines all constants for the routes of the API Resources.
+    &#34;&#34;&#34;
+
     EVENTS_V1 = &#39;/api/v1/events&#39;
     USERS_V1 = &#39;/api/v1/users&#39;
     LOGIN_V1 = &#39;/api/v1/auth/login&#39;
@@ -328,39 +188,13 @@ class Routes:
 <ul class="">
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_200_OK" href="#api.resources.constants.HttpStatusCode.HTTP_200_OK">HTTP_200_OK</a></code></li>
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_201_CREATED" href="#api.resources.constants.HttpStatusCode.HTTP_201_CREATED">HTTP_201_CREATED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_202_ACCEPTED" href="#api.resources.constants.HttpStatusCode.HTTP_202_ACCEPTED">HTTP_202_ACCEPTED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_203_NON_AUTHORITATIVE_INFORMATION" href="#api.resources.constants.HttpStatusCode.HTTP_203_NON_AUTHORITATIVE_INFORMATION">HTTP_203_NON_AUTHORITATIVE_INFORMATION</a></code></li>
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_204_NO_CONTENT" href="#api.resources.constants.HttpStatusCode.HTTP_204_NO_CONTENT">HTTP_204_NO_CONTENT</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_205_RESET_CONTENT" href="#api.resources.constants.HttpStatusCode.HTTP_205_RESET_CONTENT">HTTP_205_RESET_CONTENT</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_206_PARTIAL_CONTENT" href="#api.resources.constants.HttpStatusCode.HTTP_206_PARTIAL_CONTENT">HTTP_206_PARTIAL_CONTENT</a></code></li>
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_400_BAD_REQUEST" href="#api.resources.constants.HttpStatusCode.HTTP_400_BAD_REQUEST">HTTP_400_BAD_REQUEST</a></code></li>
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_401_UNAUTHORIZED" href="#api.resources.constants.HttpStatusCode.HTTP_401_UNAUTHORIZED">HTTP_401_UNAUTHORIZED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_402_PAYMENT_REQUIRED" href="#api.resources.constants.HttpStatusCode.HTTP_402_PAYMENT_REQUIRED">HTTP_402_PAYMENT_REQUIRED</a></code></li>
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_403_FORBIDDEN" href="#api.resources.constants.HttpStatusCode.HTTP_403_FORBIDDEN">HTTP_403_FORBIDDEN</a></code></li>
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_404_NOT_FOUND" href="#api.resources.constants.HttpStatusCode.HTTP_404_NOT_FOUND">HTTP_404_NOT_FOUND</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_405_METHOD_NOT_ALLOWED" href="#api.resources.constants.HttpStatusCode.HTTP_405_METHOD_NOT_ALLOWED">HTTP_405_METHOD_NOT_ALLOWED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_406_NOT_ACCEPTABLE" href="#api.resources.constants.HttpStatusCode.HTTP_406_NOT_ACCEPTABLE">HTTP_406_NOT_ACCEPTABLE</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_407_PROXY_AUTHENTICATION_REQUIRED" href="#api.resources.constants.HttpStatusCode.HTTP_407_PROXY_AUTHENTICATION_REQUIRED">HTTP_407_PROXY_AUTHENTICATION_REQUIRED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_408_REQUEST_TIMEOUT" href="#api.resources.constants.HttpStatusCode.HTTP_408_REQUEST_TIMEOUT">HTTP_408_REQUEST_TIMEOUT</a></code></li>
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_409_CONFLICT" href="#api.resources.constants.HttpStatusCode.HTTP_409_CONFLICT">HTTP_409_CONFLICT</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_410_GONE" href="#api.resources.constants.HttpStatusCode.HTTP_410_GONE">HTTP_410_GONE</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_411_LENGTH_REQUIRED" href="#api.resources.constants.HttpStatusCode.HTTP_411_LENGTH_REQUIRED">HTTP_411_LENGTH_REQUIRED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_412_PRECONDITION_FAILED" href="#api.resources.constants.HttpStatusCode.HTTP_412_PRECONDITION_FAILED">HTTP_412_PRECONDITION_FAILED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_413_REQUEST_ENTITY_TOO_LARGE" href="#api.resources.constants.HttpStatusCode.HTTP_413_REQUEST_ENTITY_TOO_LARGE">HTTP_413_REQUEST_ENTITY_TOO_LARGE</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_414_REQUEST_URI_TOO_LONG" href="#api.resources.constants.HttpStatusCode.HTTP_414_REQUEST_URI_TOO_LONG">HTTP_414_REQUEST_URI_TOO_LONG</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_415_UNSUPPORTED_MEDIA_TYPE" href="#api.resources.constants.HttpStatusCode.HTTP_415_UNSUPPORTED_MEDIA_TYPE">HTTP_415_UNSUPPORTED_MEDIA_TYPE</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE" href="#api.resources.constants.HttpStatusCode.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE">HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_417_EXPECTATION_FAILED" href="#api.resources.constants.HttpStatusCode.HTTP_417_EXPECTATION_FAILED">HTTP_417_EXPECTATION_FAILED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_428_PRECONDITION_REQUIRED" href="#api.resources.constants.HttpStatusCode.HTTP_428_PRECONDITION_REQUIRED">HTTP_428_PRECONDITION_REQUIRED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_429_TOO_MANY_REQUESTS" href="#api.resources.constants.HttpStatusCode.HTTP_429_TOO_MANY_REQUESTS">HTTP_429_TOO_MANY_REQUESTS</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_431_REQUEST_HEADER_FIELDS_TOO_LARGE" href="#api.resources.constants.HttpStatusCode.HTTP_431_REQUEST_HEADER_FIELDS_TOO_LARGE">HTTP_431_REQUEST_HEADER_FIELDS_TOO_LARGE</a></code></li>
 <li><code><a title="api.resources.constants.HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR" href="#api.resources.constants.HttpStatusCode.HTTP_500_INTERNAL_SERVER_ERROR">HTTP_500_INTERNAL_SERVER_ERROR</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_501_NOT_IMPLEMENTED" href="#api.resources.constants.HttpStatusCode.HTTP_501_NOT_IMPLEMENTED">HTTP_501_NOT_IMPLEMENTED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_502_BAD_GATEWAY" href="#api.resources.constants.HttpStatusCode.HTTP_502_BAD_GATEWAY">HTTP_502_BAD_GATEWAY</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_503_SERVICE_UNAVAILABLE" href="#api.resources.constants.HttpStatusCode.HTTP_503_SERVICE_UNAVAILABLE">HTTP_503_SERVICE_UNAVAILABLE</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_504_GATEWAY_TIMEOUT" href="#api.resources.constants.HttpStatusCode.HTTP_504_GATEWAY_TIMEOUT">HTTP_504_GATEWAY_TIMEOUT</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_505_HTTP_VERSION_NOT_SUPPORTED" href="#api.resources.constants.HttpStatusCode.HTTP_505_HTTP_VERSION_NOT_SUPPORTED">HTTP_505_HTTP_VERSION_NOT_SUPPORTED</a></code></li>
-<li><code><a title="api.resources.constants.HttpStatusCode.HTTP_511_NETWORK_AUTHENTICATION_REQUIRED" href="#api.resources.constants.HttpStatusCode.HTTP_511_NETWORK_AUTHENTICATION_REQUIRED">HTTP_511_NETWORK_AUTHENTICATION_REQUIRED</a></code></li>
 </ul>
 </li>
 <li>

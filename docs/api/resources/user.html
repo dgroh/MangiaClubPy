@@ -125,20 +125,22 @@ class UserList(Resource):
     def post(self):
         args = self.parser.parse_args()
 
-        existing_user = app.mongo.db.users.find_one({&#39;email&#39;: args[&#39;email&#39;]})
+        email = args[&#39;email&#39;].strip()
+
+        existing_user = app.mongo.db.users.find_one({&#39;email&#39;: email})
 
         if existing_user is None:
             password_salt = bcrypt.gensalt()
 
-            hashed_password = bcrypt.hashpw(args[&#39;password&#39;].encode(&#39;utf-8&#39;), password_salt)
+            hashed_password = bcrypt.hashpw(args[&#39;password&#39;].strip().encode(&#39;utf-8&#39;), password_salt)
 
             inserted_id = app.mongo.db.users.insert_one({
-                &#39;email&#39;: args[&#39;email&#39;],
-                &#39;first_name&#39;: args[&#39;first_name&#39;],
-                &#39;last_name&#39;: args[&#39;last_name&#39;],
+                &#39;email&#39;: email,
+                &#39;first_name&#39;: args[&#39;first_name&#39;].strip(),
+                &#39;last_name&#39;: args[&#39;last_name&#39;].strip(),
                 &#39;hashed_password&#39;: hashed_password,
                 &#39;password_salt&#39;: password_salt,
-                &#39;phone&#39;: args[&#39;phone&#39;],
+                &#39;phone&#39;: args[&#39;phone&#39;].strip(),
                 &#39;published:&#39;: True,
                 &#39;created_datetime&#39;: datetime.utcnow()
             }).inserted_id
@@ -363,20 +365,22 @@ from the url rule used when adding the resource to an Api instance. See
     def post(self):
         args = self.parser.parse_args()
 
-        existing_user = app.mongo.db.users.find_one({&#39;email&#39;: args[&#39;email&#39;]})
+        email = args[&#39;email&#39;].strip()
+
+        existing_user = app.mongo.db.users.find_one({&#39;email&#39;: email})
 
         if existing_user is None:
             password_salt = bcrypt.gensalt()
 
-            hashed_password = bcrypt.hashpw(args[&#39;password&#39;].encode(&#39;utf-8&#39;), password_salt)
+            hashed_password = bcrypt.hashpw(args[&#39;password&#39;].strip().encode(&#39;utf-8&#39;), password_salt)
 
             inserted_id = app.mongo.db.users.insert_one({
-                &#39;email&#39;: args[&#39;email&#39;],
-                &#39;first_name&#39;: args[&#39;first_name&#39;],
-                &#39;last_name&#39;: args[&#39;last_name&#39;],
+                &#39;email&#39;: email,
+                &#39;first_name&#39;: args[&#39;first_name&#39;].strip(),
+                &#39;last_name&#39;: args[&#39;last_name&#39;].strip(),
                 &#39;hashed_password&#39;: hashed_password,
                 &#39;password_salt&#39;: password_salt,
-                &#39;phone&#39;: args[&#39;phone&#39;],
+                &#39;phone&#39;: args[&#39;phone&#39;].strip(),
                 &#39;published:&#39;: True,
                 &#39;created_datetime&#39;: datetime.utcnow()
             }).inserted_id
@@ -442,20 +446,22 @@ from the url rule used when adding the resource to an Api instance. See
 <pre><code class="python">def post(self):
     args = self.parser.parse_args()
 
-    existing_user = app.mongo.db.users.find_one({&#39;email&#39;: args[&#39;email&#39;]})
+    email = args[&#39;email&#39;].strip()
+
+    existing_user = app.mongo.db.users.find_one({&#39;email&#39;: email})
 
     if existing_user is None:
         password_salt = bcrypt.gensalt()
 
-        hashed_password = bcrypt.hashpw(args[&#39;password&#39;].encode(&#39;utf-8&#39;), password_salt)
+        hashed_password = bcrypt.hashpw(args[&#39;password&#39;].strip().encode(&#39;utf-8&#39;), password_salt)
 
         inserted_id = app.mongo.db.users.insert_one({
-            &#39;email&#39;: args[&#39;email&#39;],
-            &#39;first_name&#39;: args[&#39;first_name&#39;],
-            &#39;last_name&#39;: args[&#39;last_name&#39;],
+            &#39;email&#39;: email,
+            &#39;first_name&#39;: args[&#39;first_name&#39;].strip(),
+            &#39;last_name&#39;: args[&#39;last_name&#39;].strip(),
             &#39;hashed_password&#39;: hashed_password,
             &#39;password_salt&#39;: password_salt,
-            &#39;phone&#39;: args[&#39;phone&#39;],
+            &#39;phone&#39;: args[&#39;phone&#39;].strip(),
             &#39;published:&#39;: True,
             &#39;created_datetime&#39;: datetime.utcnow()
         }).inserted_id
