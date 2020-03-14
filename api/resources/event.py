@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+""" Event module which holds all the logic for handling events.
+
+Currently the event is represented by the arguments of the HTTP request, which are:
+
+- Name - [Required]
+- Start datetime - [Required]
+- End datetime - [Required]
+- Max guests allowed - [Required]
+- Cuisine - [Required]
+- Price per person - [Request]
+- Description - [Request]
+- Guests - [Not Required and only available for `put`]
+- Rating - [Not Required and only available for `put`]
+
+"""
+
 from flask import make_response, current_app as app
 from flask_restful import Resource, reqparse
 from datetime import datetime
@@ -19,6 +36,18 @@ base_parser.add_argument('description', required=True, location='json')
 class Event(Resource):
 
     def __init__(self):
+        """
+        This class represents the event resource.
+        
+        Here also a copy of the request parser is made and all 
+        arguments are set as not required as for `get` and `put`
+        required arguments are not needed. 
+
+        The request parser is extended for `put` with following arguments: 
+        - `guests`
+        - `rating`
+        """
+
         self.parser = base_parser.copy()
 
         # TODO: Use list comprehension with new symbol in Python 3.8: 
@@ -30,6 +59,16 @@ class Event(Resource):
         self.parser.add_argument('rating', location='json')
 
     def get(self, id):
+        """
+        This method returns the event found by id.
+        
+        __Returns:__
+
+        * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+        * If event not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If success: A json response with the event data
+        """
+
         if not ObjectId.is_valid(id):
             return make_response('[HTTP_400_BAD_REQUEST]', HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -46,6 +85,16 @@ class Event(Resource):
 
     @token_required
     def put(self, user_id, id):
+        """
+        This method updates the event and is only accessible with authentication token.
+        
+        __Returns:__
+
+        * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+        * If event not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If success: No content as per default for HTTP Status Code 204
+        """
+
         if not ObjectId.is_valid(id):
             return make_response('[HTTP_400_BAD_REQUEST]', HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -78,11 +127,19 @@ class Event(Resource):
 
 
 class EventList(Resource):
-
-    def __init__(self):
-        self.parser = base_parser.copy()
+    """
+    This class represents events resource.
+    """
 
     def get(self):
+        """
+        This method returns the list of events.
+        
+        __Returns:__
+
+        A json response with list of events or an empty list if no events in the database
+        """
+
         response = []
         events = app.mongo.db.events.find()
 
@@ -94,7 +151,15 @@ class EventList(Resource):
 
     @token_required
     def post(self, user_id):
-        args = self.parser.parse_args()
+        """
+        This method creates a new event.
+        
+        __Returns:__
+
+        * If success: A json response with the text [HTTP_201_CREATED]
+        """
+
+        args = base_parser.parse_args()
 
         events = app.mongo.db.events
 

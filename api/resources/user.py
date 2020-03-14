@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+""" User module which holds all the logic of the application user.
+
+Currently the user is represented by the arguments of the HTTP request, which are:
+
+- Email - [Required]
+- First name - [Required]
+- Last name - [Required]
+- Password - [Required]
+- Phone number - [Required]
+- Is Host - [Not Required and only available for `put`]
+- Rating - [Not Required and only available for `put`]
+
+"""
+
 from flask import make_response, current_app as app
 from flask_restful import Resource, reqparse
 from datetime import datetime
@@ -17,8 +32,22 @@ base_parser.add_argument('phone', required=True, location='json')
 
 
 class User(Resource):
+    """
+    """
 
     def __init__(self):
+        """
+        This class represents the user resource.
+        
+        Here also a copy of the request parser is made and all 
+        arguments are set as not required as for `get` and `put`
+        required arguments are not needed. 
+
+        The request parser is extended for `put` with following arguments: 
+        - `is_host`
+        - `rating`
+        """
+
         self.parser = base_parser.copy()
 
         for arg in self.parser.args:
@@ -28,6 +57,16 @@ class User(Resource):
         self.parser.add_argument('rating', location='json')
 
     def get(self, id):
+        """
+        This method returns the user found by id.
+        
+        __Returns:__
+
+        * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If success: A json response with the user data
+        """
+
         if not ObjectId.is_valid(id):
             return make_response('[HTTP_400_BAD_REQUEST]', HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -46,6 +85,16 @@ class User(Resource):
 
     @token_required
     def put(self, user_id, id):
+        """
+        This method updates the user and is only accessible with authentication token.
+        
+        __Returns:__
+
+        * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If success: No content as per default for HTTP Status Code 204
+        """
+
         if not ObjectId.is_valid(id):
             return make_response('[HTTP_400_BAD_REQUEST]', HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -63,6 +112,7 @@ class User(Resource):
         fields = {key: value for key,
                   value in args.items() if value is not None}
 
+        # The update occurs only if arguments have been passed via request
         if len(fields):
             users.update_one({'_id': object_id},
                             {
@@ -79,11 +129,19 @@ class User(Resource):
 
 
 class UserList(Resource):
-
-    def __init__(self):
-        self.parser = base_parser.copy()
+    """
+    This class represents users resource.
+    """
 
     def get(self):
+        """
+        This method returns the list of users.
+        
+        __Returns:__
+
+        A json response with list of users or an empty list if no users in the database
+        """
+
         response = []
         users = app.mongo.db.users.find()
 
@@ -97,7 +155,16 @@ class UserList(Resource):
         return make_response({'data': response}, HttpStatusCode.HTTP_200_OK)
 
     def post(self):
-        args = self.parser.parse_args()
+        """
+        This method creates a new user.
+        
+        __Returns:__
+
+        * If user already exists: A json response with the text [HTTP_409_CONFLICT]
+        * If success: A json response with the text [HTTP_201_CREATED]
+        """
+
+        args = base_parser.parse_args()
 
         email = args['email'].strip()
 

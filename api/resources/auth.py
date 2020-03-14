@@ -148,7 +148,6 @@ class Logout(Resource):
         __Returns__:
             
         This method does not return content as per default for HTTP Status Code 204
-
         """
 
         # TODO: Blacklist the Token?

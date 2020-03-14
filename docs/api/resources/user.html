@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.7.5" />
 <title>api.resources.user API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="User module which holds all the logic of the application user …" />
 <link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
 <link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
@@ -20,11 +20,37 @@
 <h1 class="title">Module <code>api.resources.user</code></h1>
 </header>
 <section id="section-intro">
+<p>User module which holds all the logic of the application user.</p>
+<p>Currently the user is represented by the arguments of the HTTP request, which are:</p>
+<ul>
+<li>Email - [Required]</li>
+<li>First name - [Required]</li>
+<li>Last name - [Required]</li>
+<li>Password - [Required]</li>
+<li>Phone number - [Required]</li>
+<li>Is Host - [Not Required and only available for <code>put</code>]</li>
+<li>Rating - [Not Required and only available for <code>put</code>]</li>
+</ul>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from flask import make_response, current_app as app
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34; User module which holds all the logic of the application user.
+
+Currently the user is represented by the arguments of the HTTP request, which are:
+
+- Email - [Required]
+- First name - [Required]
+- Last name - [Required]
+- Password - [Required]
+- Phone number - [Required]
+- Is Host - [Not Required and only available for `put`]
+- Rating - [Not Required and only available for `put`]
+
+&#34;&#34;&#34;
+
+from flask import make_response, current_app as app
 from flask_restful import Resource, reqparse
 from datetime import datetime
 from bson import ObjectId
@@ -43,8 +69,22 @@ base_parser.add_argument(&#39;phone&#39;, required=True, location=&#39;json&#39;
 
 
 class User(Resource):
+    &#34;&#34;&#34;
+    &#34;&#34;&#34;
 
     def __init__(self):
+        &#34;&#34;&#34;
+        This class represents the user resource.
+        
+        Here also a copy of the request parser is made and all 
+        arguments are set as not required as for `get` and `put`
+        required arguments are not needed. 
+
+        The request parser is extended for `put` with following arguments: 
+        - `is_host`
+        - `rating`
+        &#34;&#34;&#34;
+
         self.parser = base_parser.copy()
 
         for arg in self.parser.args:
@@ -54,6 +94,16 @@ class User(Resource):
         self.parser.add_argument(&#39;rating&#39;, location=&#39;json&#39;)
 
     def get(self, id):
+        &#34;&#34;&#34;
+        This method returns the user found by id.
+        
+        __Returns:__
+
+        * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If success: A json response with the user data
+        &#34;&#34;&#34;
+
         if not ObjectId.is_valid(id):
             return make_response(&#39;[HTTP_400_BAD_REQUEST]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -72,6 +122,16 @@ class User(Resource):
 
     @token_required
     def put(self, user_id, id):
+        &#34;&#34;&#34;
+        This method updates the user and is only accessible with authentication token.
+        
+        __Returns:__
+
+        * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If success: No content as per default for HTTP Status Code 204
+        &#34;&#34;&#34;
+
         if not ObjectId.is_valid(id):
             return make_response(&#39;[HTTP_400_BAD_REQUEST]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -89,6 +149,7 @@ class User(Resource):
         fields = {key: value for key,
                   value in args.items() if value is not None}
 
+        # The update occurs only if arguments have been passed via request
         if len(fields):
             users.update_one({&#39;_id&#39;: object_id},
                             {
@@ -105,11 +166,19 @@ class User(Resource):
 
 
 class UserList(Resource):
-
-    def __init__(self):
-        self.parser = base_parser.copy()
+    &#34;&#34;&#34;
+    This class represents users resource.
+    &#34;&#34;&#34;
 
     def get(self):
+        &#34;&#34;&#34;
+        This method returns the list of users.
+        
+        __Returns:__
+
+        A json response with list of users or an empty list if no users in the database
+        &#34;&#34;&#34;
+
         response = []
         users = app.mongo.db.users.find()
 
@@ -123,7 +192,16 @@ class UserList(Resource):
         return make_response({&#39;data&#39;: response}, HttpStatusCode.HTTP_200_OK)
 
     def post(self):
-        args = self.parser.parse_args()
+        &#34;&#34;&#34;
+        This method creates a new user.
+        
+        __Returns:__
+
+        * If user already exists: A json response with the text [HTTP_409_CONFLICT]
+        * If success: A json response with the text [HTTP_201_CREATED]
+        &#34;&#34;&#34;
+
+        args = base_parser.parse_args()
 
         email = args[&#39;email&#39;].strip()
 
@@ -170,20 +248,34 @@ class UserList(Resource):
 <span>class <span class="ident">User</span></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Represents an abstract RESTful resource. Concrete resources should
-extend from this class and expose methods for each supported HTTP
-method. If a resource is invoked with an unsupported HTTP method,
-the API will return a response with status 405 Method Not Allowed.
-Otherwise the appropriate method is called and passed all arguments
-from the url rule used when adding the resource to an Api instance. See
-:meth:<code>~flask_restful.Api.add_resource</code> for details.</p></section>
+<section class="desc"><p>This class represents the user resource.</p>
+<p>Here also a copy of the request parser is made and all
+arguments are set as not required as for <code>get</code> and <code>put</code>
+required arguments are not needed. </p>
+<p>The request parser is extended for <code>put</code> with following arguments:
+- <code>is_host</code>
+- <code>rating</code></p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class User(Resource):
+    &#34;&#34;&#34;
+    &#34;&#34;&#34;
 
     def __init__(self):
+        &#34;&#34;&#34;
+        This class represents the user resource.
+        
+        Here also a copy of the request parser is made and all 
+        arguments are set as not required as for `get` and `put`
+        required arguments are not needed. 
+
+        The request parser is extended for `put` with following arguments: 
+        - `is_host`
+        - `rating`
+        &#34;&#34;&#34;
+
         self.parser = base_parser.copy()
 
         for arg in self.parser.args:
@@ -193,6 +285,16 @@ from the url rule used when adding the resource to an Api instance. See
         self.parser.add_argument(&#39;rating&#39;, location=&#39;json&#39;)
 
     def get(self, id):
+        &#34;&#34;&#34;
+        This method returns the user found by id.
+        
+        __Returns:__
+
+        * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If success: A json response with the user data
+        &#34;&#34;&#34;
+
         if not ObjectId.is_valid(id):
             return make_response(&#39;[HTTP_400_BAD_REQUEST]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -211,6 +313,16 @@ from the url rule used when adding the resource to an Api instance. See
 
     @token_required
     def put(self, user_id, id):
+        &#34;&#34;&#34;
+        This method updates the user and is only accessible with authentication token.
+        
+        __Returns:__
+
+        * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+        * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+        * If success: No content as per default for HTTP Status Code 204
+        &#34;&#34;&#34;
+
         if not ObjectId.is_valid(id):
             return make_response(&#39;[HTTP_400_BAD_REQUEST]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -228,6 +340,7 @@ from the url rule used when adding the resource to an Api instance. See
         fields = {key: value for key,
                   value in args.items() if value is not None}
 
+        # The update occurs only if arguments have been passed via request
         if len(fields):
             users.update_one({&#39;_id&#39;: object_id},
                             {
@@ -261,12 +374,28 @@ from the url rule used when adding the resource to an Api instance. See
 <span>def <span class="ident">get</span></span>(<span>self, id)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This method returns the user found by id.</p>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]</li>
+<li>If user not found: A json response with the text [HTTP_404_NOT_FOUND]</li>
+<li>If success: A json response with the user data</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get(self, id):
+    &#34;&#34;&#34;
+    This method returns the user found by id.
+    
+    __Returns:__
+
+    * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+    * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+    * If success: A json response with the user data
+    &#34;&#34;&#34;
+
     if not ObjectId.is_valid(id):
         return make_response(&#39;[HTTP_400_BAD_REQUEST]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -288,13 +417,29 @@ from the url rule used when adding the resource to an Api instance. See
 <span>def <span class="ident">put</span></span>(<span>self, user_id, id)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This method updates the user and is only accessible with authentication token.</p>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]</li>
+<li>If user not found: A json response with the text [HTTP_404_NOT_FOUND]</li>
+<li>If success: No content as per default for HTTP Status Code 204</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@token_required
 def put(self, user_id, id):
+    &#34;&#34;&#34;
+    This method updates the user and is only accessible with authentication token.
+    
+    __Returns:__
+
+    * If id is invalid: A json response with the text [HTTP_400_BAD_REQUEST]
+    * If user not found: A json response with the text [HTTP_404_NOT_FOUND]
+    * If success: No content as per default for HTTP Status Code 204
+    &#34;&#34;&#34;
+
     if not ObjectId.is_valid(id):
         return make_response(&#39;[HTTP_400_BAD_REQUEST]&#39;, HttpStatusCode.HTTP_400_BAD_REQUEST)
 
@@ -312,6 +457,7 @@ def put(self, user_id, id):
     fields = {key: value for key,
               value in args.items() if value is not None}
 
+    # The update occurs only if arguments have been passed via request
     if len(fields):
         users.update_one({&#39;_id&#39;: object_id},
                         {
@@ -333,23 +479,25 @@ def put(self, user_id, id):
 <span>class <span class="ident">UserList</span></span>
 </code></dt>
 <dd>
-<section class="desc"><p>Represents an abstract RESTful resource. Concrete resources should
-extend from this class and expose methods for each supported HTTP
-method. If a resource is invoked with an unsupported HTTP method,
-the API will return a response with status 405 Method Not Allowed.
-Otherwise the appropriate method is called and passed all arguments
-from the url rule used when adding the resource to an Api instance. See
-:meth:<code>~flask_restful.Api.add_resource</code> for details.</p></section>
+<section class="desc"><p>This class represents users resource.</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class UserList(Resource):
-
-    def __init__(self):
-        self.parser = base_parser.copy()
+    &#34;&#34;&#34;
+    This class represents users resource.
+    &#34;&#34;&#34;
 
     def get(self):
+        &#34;&#34;&#34;
+        This method returns the list of users.
+        
+        __Returns:__
+
+        A json response with list of users or an empty list if no users in the database
+        &#34;&#34;&#34;
+
         response = []
         users = app.mongo.db.users.find()
 
@@ -363,7 +511,16 @@ from the url rule used when adding the resource to an Api instance. See
         return make_response({&#39;data&#39;: response}, HttpStatusCode.HTTP_200_OK)
 
     def post(self):
-        args = self.parser.parse_args()
+        &#34;&#34;&#34;
+        This method creates a new user.
+        
+        __Returns:__
+
+        * If user already exists: A json response with the text [HTTP_409_CONFLICT]
+        * If success: A json response with the text [HTTP_201_CREATED]
+        &#34;&#34;&#34;
+
+        args = base_parser.parse_args()
 
         email = args[&#39;email&#39;].strip()
 
@@ -415,12 +572,22 @@ from the url rule used when adding the resource to an Api instance. See
 <span>def <span class="ident">get</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This method returns the list of users.</p>
+<p><strong>Returns:</strong></p>
+<p>A json response with list of users or an empty list if no users in the database</p></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get(self):
+    &#34;&#34;&#34;
+    This method returns the list of users.
+    
+    __Returns:__
+
+    A json response with list of users or an empty list if no users in the database
+    &#34;&#34;&#34;
+
     response = []
     users = app.mongo.db.users.find()
 
@@ -438,13 +605,27 @@ from the url rule used when adding the resource to an Api instance. See
 <span>def <span class="ident">post</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<section class="desc"></section>
+<section class="desc"><p>This method creates a new user.</p>
+<p><strong>Returns:</strong></p>
+<ul>
+<li>If user already exists: A json response with the text [HTTP_409_CONFLICT]</li>
+<li>If success: A json response with the text [HTTP_201_CREATED]</li>
+</ul></section>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def post(self):
-    args = self.parser.parse_args()
+    &#34;&#34;&#34;
+    This method creates a new user.
+    
+    __Returns:__
+
+    * If user already exists: A json response with the text [HTTP_409_CONFLICT]
+    * If success: A json response with the text [HTTP_201_CREATED]
+    &#34;&#34;&#34;
+
+    args = base_parser.parse_args()
 
     email = args[&#39;email&#39;].strip()
 
