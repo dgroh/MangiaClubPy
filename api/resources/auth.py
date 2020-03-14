@@ -154,3 +154,4 @@ class Logout(Resource):
         app.redis.delete(f'auth|{user_id}')
 
         return make_response('[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT)
+
