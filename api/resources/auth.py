@@ -148,10 +148,10 @@ class Logout(Resource):
         __Returns__:
             
         This method does not return content as per default for HTTP Status Code 204
-
         """
 
         # TODO: Blacklist the Token?
         app.redis.delete(f'auth|{user_id}')
 
         return make_response('[HTTP_204_NO_CONTENT]', HttpStatusCode.HTTP_204_NO_CONTENT)
+
