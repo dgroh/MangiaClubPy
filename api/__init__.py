@@ -26,9 +26,9 @@ def create_app():
     
     config = ProductionConfig
 
-    if app.config['ENV'] is 'development':
+    if app.config['ENV'] == 'development':
         config = DevelopmentConfig
-    elif app.config['ENV'] is 'testing':
+    elif app.config['ENV'] == 'testing':
         config = TestingConfig
 
     app.config.from_object(config)
