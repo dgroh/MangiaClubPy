@@ -6,7 +6,6 @@ import mongomock
 
 from api import create_app
 from config import DevelopmentConfig, ProductionConfig, TestingConfig
-from unittest.mock import NonCallableMock
 
 
 class TestConfigMethods(unittest.TestCase):
@@ -43,7 +42,7 @@ class TestConfigMethods(unittest.TestCase):
         self.__assert_attributes(TestingConfig, app.config)
 
     def __assert_attributes(self, env_config, app_config):
-        env_config_attrs = set(sorted(env_config.__dict__.items())[:-2])
+        env_config_attrs = set(sorted(vars(env_config).items())[:-2])
         app_config_attrs = set(dict(app_config).items())
 
         self.assertTrue(env_config_attrs.issubset(app_config_attrs))
