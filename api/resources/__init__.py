@@ -5,8 +5,8 @@
 from flask_restful import Api
 
 from api.resources.auth import Login, Logout
-from api.resources.event import EventList, Event
-from api.resources.user import UserList, User
+from api.resources.events import EventList, Event
+from api.resources.users import UserList, User
 from api.resources.constants import Routes
 
 
